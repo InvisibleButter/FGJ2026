@@ -46,7 +46,7 @@ public class PuzzleManager : MonoBehaviour, IService
 
     public int GetRemainingCandy(CandyType type) => _trackedGameState?.GetRemainingCandy(type) ?? 0;
 
-    private void ChangePhase(Phase nextPhase)
+    public void ChangePhase(Phase nextPhase)
     {
         CurrentPhase = nextPhase;
         _gridService.CanPlaceItems = nextPhase == Phase.Planning;

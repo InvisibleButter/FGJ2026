@@ -9,7 +9,7 @@ using UnityEngine.UI;
 public class CandyPlacementService : MonoBehaviour, IService
 {
     [SerializeField] private Camera boardCamera;
-    [SerializeField] private Button redCandyButton, greenCandyButton;
+    [SerializeField] private Button redCandyButton, greenCandyButton, startAttemptButton;
     [SerializeField] private GameObject candyHolder;
 
     private readonly List<RaycastResult> pointerHits = new List<RaycastResult>();
@@ -25,6 +25,12 @@ public class CandyPlacementService : MonoBehaviour, IService
     {
         redCandyButton.onClick.AddListener(() => SelectCandy(CandyType.Red));
         greenCandyButton.onClick.AddListener(() => SelectCandy(CandyType.Green));
+        startAttemptButton.onClick.AddListener(StartAttempt);
+    }
+
+    private void StartAttempt()
+    {
+        puzzleManager.ChangePhase(Phase.Running);
     }
 
     internal void Configure(PuzzleManager manager, GridService grid)
@@ -51,11 +57,15 @@ public class CandyPlacementService : MonoBehaviour, IService
 
     public void ToggleUI(bool active)
     {
+        _isActive = active;
+        RefreshButtons();
+        candyHolder.SetActive(_isActive);
+    }
+
+    private void RefreshButtons()
+    {
         greenCandyButton.interactable = puzzleManager.GetRemainingCandy(CandyType.Green) > 0;
         redCandyButton.interactable = puzzleManager.GetRemainingCandy(CandyType.Red) > 0;
-        
-        candyHolder.SetActive(active);
-        _isActive = active;
     }
 
     private void Update()
@@ -86,6 +96,8 @@ public class CandyPlacementService : MonoBehaviour, IService
             gridService.TryRemoveCandy(cell);
         else
             gridService.TryPlaceCandy(cell, selectedCandy.Value);
+        
+        RefreshButtons();
     }
 
     private bool IsOverUI(Vector2 position)
