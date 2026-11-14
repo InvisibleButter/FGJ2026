@@ -46,7 +46,10 @@ public class ServiceLocator
     {
         foreach(var service in _registeredServices)
         {
-            service.Value.Initialize();
+            if(!service.Value.IsInitialized)
+            {
+                service.Value.Initialize();
+            }
         }
 
         OnAllInitilized?.Invoke();

@@ -9,6 +9,7 @@ public class PuzzleManager : MonoBehaviour, IService
     private LevelService _levelService;
     private GridService _gridService;
     private CandyPlacementService _candyPlacement;
+    private AnimalMovement _animalMovement;
     private TrackedGameState _trackedGameState;
     
     public Phase CurrentPhase { get; private set; } = Phase.LoadFailed;
@@ -37,8 +38,11 @@ public class PuzzleManager : MonoBehaviour, IService
             ServiceLocator.Instance.Add(service);
         }
         
+        _animalMovement = ServiceLocator.Instance.GetService<AnimalMovement>();
         _candyPlacement = ServiceLocator.Instance.GetService<CandyPlacementService>();
-        _candyPlacement.Configure(this, _gridService);
+        
+        _animalMovement.Initialize();
+        _candyPlacement.Initialize();
         
         ChangePhase(Phase.Planning);
         IsInitialized = true;
@@ -54,6 +58,12 @@ public class PuzzleManager : MonoBehaviour, IService
         
         switch (nextPhase)
         {
+            case Phase.Planning:
+                _animalMovement.ResetToStart();
+                break;
+            case Phase.Running:
+                _animalMovement.StartMovement();
+                break;
             case Phase.AttemptFinished:
                 ChangePhase(_trackedGameState.ReduceAttemptsLeft() ? Phase.Planning : Phase.LevelFailed);
                 break;
@@ -65,6 +75,12 @@ public class PuzzleManager : MonoBehaviour, IService
                 _levelService.ReturnToMenu();
                 break;
         }
+    }
+
+    internal void OnAttemptFinished(AttemptResult result)
+    {
+        if (CurrentPhase == Phase.Running)
+            ChangePhase(result == AttemptResult.ReachedGoal ? Phase.LevelCleared : Phase.AttemptFinished);
     }
 
     internal void OnMapLoaded(PuzzleMap map)
@@ -80,6 +96,7 @@ public class PuzzleManager : MonoBehaviour, IService
 
     public void DeInitialize()
     {
+        _animalMovement.DeInitialize();
         IsInitialized = false;
     }
 
@@ -107,7 +124,9 @@ public enum AttemptResult
     ReachedGoal,
     Blocked,
     LeftBoard,
-    StepLimit
+    StepLimit,
+    ReachedCandy,
+    ReachedClue
 }
 
 public class TrackedGameState

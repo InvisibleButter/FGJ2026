@@ -32,15 +32,12 @@ public class CandyPlacementService : MonoBehaviour, IService
     {
         puzzleManager.ChangePhase(Phase.Running);
     }
-
-    internal void Configure(PuzzleManager manager, GridService grid)
-    {
-        puzzleManager = manager;
-        gridService = grid;
-    }
-
+    
     public void Initialize()
     {
+        puzzleManager = ServiceLocator.Instance.GetService<PuzzleManager>();
+        gridService = ServiceLocator.Instance.GetService<GridService>();
+        
         IsInitialized = true;
     }
 
@@ -57,6 +54,10 @@ public class CandyPlacementService : MonoBehaviour, IService
 
     public void ToggleUI(bool active)
     {
+        if (!IsInitialized)
+        {
+            Initialize();
+        }
         _isActive = active;
         RefreshButtons();
         candyHolder.SetActive(_isActive);
@@ -70,7 +71,7 @@ public class CandyPlacementService : MonoBehaviour, IService
 
     private void Update()
     {
-        if (!_isActive)
+        if (!_isActive || !IsInitialized)
         {
             return;
         }
