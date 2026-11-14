@@ -25,10 +25,8 @@ namespace FGJ2026
         {
             if (gameLoad != null)
                 return;
-
-            gameLoad = SceneManager.LoadSceneAsync(MainGameScene);
-            if (gameLoad != null)
-                GameManager.SelectStartingLevel(levelIndex);
+            
+            GameManager.Instance.SelectStartingLevel(levelIndex);
         }
 
         public void ShowCredits()

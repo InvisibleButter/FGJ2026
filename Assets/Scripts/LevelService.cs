@@ -2,23 +2,23 @@ using UnityEngine;
 
 namespace FGJ2026
 {
-    public sealed class LevelService
+    public sealed class LevelService : IService
     {
         private readonly TextAsset[] levels;
-        private readonly GridService grid;
+        private GridService _gridService;
 
-        internal LevelService(TextAsset[] levels, int startingLevelIndex, GridService grid)
+        internal LevelService(TextAsset[] levels, int startingLevelIndex)
         {
             this.levels = levels;
-            this.grid = grid;
+           
+            _gridService = ServiceLocator.Instance.GetService<GridService>();
             StartingLevelIndex = startingLevelIndex;
         }
 
         public int StartingLevelIndex { get; }
         public int CurrentLevelIndex { get; private set; } = -1;
         public int LevelCount => levels.Length;
-        public PuzzleMap CurrentMap => grid.Map;
-
+       
         internal bool TryLoadLevel(int index)
         {
             if (index < 0 || index >= LevelCount || levels[index] == null)
@@ -34,9 +34,21 @@ namespace FGJ2026
                 return false;
             }
 
-            grid.LoadMap(map);
+            _gridService.LoadMap(map);
             CurrentLevelIndex = index;
             return true;
         }
+
+        public void Initialize()
+        {
+            IsInitialized = true;
+        }
+
+        public void DeInitialize()
+        {
+            IsInitialized = false;
+        }
+
+        public bool IsInitialized { get; set; }
     }
 }

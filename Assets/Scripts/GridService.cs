@@ -30,7 +30,7 @@ namespace FGJ2026
         }
     }
 
-    public sealed class GridService
+    public sealed class GridService : IService
     {
         private readonly PuzzleGridView view;
         private readonly HashSet<Vector2Int> preplacedClueCells = new HashSet<Vector2Int>();
@@ -46,7 +46,7 @@ namespace FGJ2026
         public PuzzleMap Map { get; private set; }
         public bool CanPlaceItems { get; internal set; }
 
-        internal void LoadMap(PuzzleMap map)
+        public void LoadMap(PuzzleMap map)
         {
             view.RenderMap(map);
             Map = map;
@@ -138,5 +138,17 @@ namespace FGJ2026
                 !state.IsBlocked && !state.IsStart && !state.IsGoal &&
                 !state.HasPreplacedClue && state.PlacedClueType == null && state.Candy == null;
         }
+
+        public void Initialize()
+        {
+            IsInitialized = true;
+        }
+
+        public void DeInitialize()
+        {
+            IsInitialized = false;
+        }
+
+        public bool IsInitialized { get; set; }
     }
 }
