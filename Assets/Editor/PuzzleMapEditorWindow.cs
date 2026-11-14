@@ -36,9 +36,13 @@ namespace FGJ2026.Editor
         private MapData draft;
         private IntegerField width;
         private IntegerField height;
+        private IntegerField greenCandy;
+        private IntegerField redCandy;
+        private IntegerField attemptCount;
         private EnumField brush;
         private TextField cueType;
         private PopupField<string> facing;
+        private PopupField<string> cueDirection;
         private Label status;
         private VisualElement board;
         private readonly List<Sprite> previewSprites = new List<Sprite>();
@@ -92,6 +96,12 @@ namespace FGJ2026.Editor
             dimensions.Add(new Button(Generate) { text = "Generate Blank" });
             dimensions.Add(new Button(Resize) { text = "Resize" });
 
+            var counts = AddRow(root);
+            greenCandy = AddCount(counts, "Green candy", draft.greenCandy, count => draft.greenCandy = count);
+            redCandy = AddCount(counts, "Red candy", draft.redCandy, count => draft.redCandy = count);
+
+            attemptCount = AddCount(counts, "Attempt count", draft.attemptCount, count => draft.attemptCount = count);
+
             var options = AddRow(root);
             brush = new EnumField("Brush", Brush.Obstacle);
             options.Add(brush);
@@ -106,9 +116,17 @@ namespace FGJ2026.Editor
             options.Add(facing);
             cueType = new TextField("Cue type") { value = "birdsong" };
             options.Add(cueType);
+            cueDirection = new PopupField<string>("Cue direction", new List<string> { "north", "east", "south", "west" },
+                "north");
+            options.Add(cueDirection);
             cueType.style.display = DisplayStyle.None;
+            cueDirection.style.display = DisplayStyle.None;
             brush.RegisterValueChangedCallback(change =>
-                cueType.style.display = (Brush)change.newValue == Brush.Cue ? DisplayStyle.Flex : DisplayStyle.None);
+            {
+                var display = (Brush)change.newValue == Brush.Cue ? DisplayStyle.Flex : DisplayStyle.None;
+                cueType.style.display = display;
+                cueDirection.style.display = display;
+            });
 
             root.Add(new Label("Choose a brush and click a cell. Ground erases obstacles and cues.")
                 { style = { whiteSpace = WhiteSpace.Normal } });
@@ -137,6 +155,39 @@ namespace FGJ2026.Editor
             parent.Add(field);
             return field;
         }
+
+        private IntegerField AddCount(VisualElement row, string label, int count, Action<int> setCount)
+        {
+            var field = new IntegerField(label) { value = count, isDelayed = true };
+            field.RegisterValueChangedCallback(change =>
+            {
+                int value = Mathf.Max(0, change.newValue);
+                field.SetValueWithoutNotify(value);
+                if (value != change.previousValue)
+                {
+                    setCount(value);
+                    MarkChanged();
+                }
+            });
+            row.Add(field);
+            return field;
+        }
+
+        private void RefreshCounts()
+        {
+            greenCandy.SetValueWithoutNotify(draft.greenCandy);
+            redCandy.SetValueWithoutNotify(draft.redCandy);
+            attemptCount.SetValueWithoutNotify(draft.attemptCount);
+        }
+
+        private static string DirectionSymbol(string direction) => direction switch
+        {
+            "north" => "↑",
+            "east" => "→",
+            "south" => "↓",
+            "west" => "←",
+            _ => ""
+        };
 
         private static MapData CreateBoard(int width, int height) => new MapData
         {
@@ -168,6 +219,7 @@ namespace FGJ2026.Editor
             draft = CreateBoard(newWidth, newHeight);
             mapPath = null;
             facing.SetValueWithoutNotify(draft.start.facing);
+            RefreshCounts();
             MarkChanged();
             RebuildBoard();
         }
@@ -255,15 +307,17 @@ namespace FGJ2026.Editor
                     if (sources.Contains(cell))
                     {
                         color = CueColor;
-                        symbol = "C";
-                        description = string.Join(", ", sources[cell].Select(cue => cue.type));
+                        symbol = "C" + DirectionSymbol(sources[cell].First().direction);
+                        description = string.Join(", ", sources[cell].Select(cue => string.IsNullOrEmpty(cue.direction)
+                            ? cue.type
+                            : $"{cue.type} ({cue.direction})"));
                         preview = null;
                         showsGrass = false;
                     }
                     if (cell == draft.start.Position)
                     {
                         color = StartColor;
-                        symbol = draft.start.facing switch { "north" => "↑", "east" => "→", "south" => "↓", _ => "←" };
+                        symbol = DirectionSymbol(draft.start.facing);
                         description = $"Start facing {draft.start.facing}";
                         preview = null;
                         showsGrass = false;
@@ -375,7 +429,13 @@ namespace FGJ2026.Editor
                     draft.goal = new Cell { x = cell.x, y = cell.y };
                     break;
                 case Brush.Cue:
-                    draft.cues = draft.cues.Append(new CueData { x = cell.x, y = cell.y, type = type }).ToArray();
+                    draft.cues = draft.cues.Append(new CueData
+                    {
+                        x = cell.x,
+                        y = cell.y,
+                        type = type,
+                        direction = cueDirection.value
+                    }).ToArray();
                     break;
             }
 
@@ -416,6 +476,7 @@ namespace FGJ2026.Editor
             width.SetValueWithoutNotify(draft.width);
             height.SetValueWithoutNotify(draft.height);
             facing.SetValueWithoutNotify(draft.start.facing);
+            RefreshCounts();
             RebuildBoard();
             ShowStatus();
         }

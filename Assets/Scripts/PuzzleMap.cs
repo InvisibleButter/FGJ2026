@@ -14,6 +14,9 @@ namespace FGJ2026
         public Vector2Int Start { get; }
         public Vector2Int StartDirection { get; }
         public Vector2Int Goal { get; }
+        public int GreenCandy { get; }
+        public int RedCandy { get; }
+        public int AttemptCount { get; }
         public IReadOnlyList<CueSource> Cues { get; }
 
         private PuzzleMap(MapData data, Vector2Int startDirection, HashSet<Vector2Int> obstacles, CueSource[] cues)
@@ -23,6 +26,9 @@ namespace FGJ2026
             Start = data.start.Position;
             StartDirection = startDirection;
             Goal = data.goal.Position;
+            GreenCandy = data.greenCandy;
+            RedCandy = data.redCandy;
+            AttemptCount = data.attemptCount;
             blockedCells = obstacles;
             Cues = Array.AsReadOnly(cues);
         }
@@ -49,7 +55,14 @@ namespace FGJ2026
 
             try
             {
-                var data = JsonUtility.FromJson<MapData>(json);
+                var legacy = JsonUtility.FromJson<LegacyCandyCounts>(json);
+                var data = new MapData();
+                if (legacy != null)
+                {
+                    data.greenCandy = legacy.goodBonbons;
+                    data.redCandy = legacy.badBonbons;
+                }
+                JsonUtility.FromJsonOverwrite(json, data);
                 if (data == null || data.width < 1 || data.width > MaximumSize ||
                     data.height < 1 || data.height > MaximumSize)
                     throw new FormatException($"width and height must be between 1 and {MaximumSize}.");
@@ -59,14 +72,12 @@ namespace FGJ2026
                 if (start == goal)
                     throw new FormatException("start and goal must be different cells.");
 
-                Vector2Int direction = data.start.facing switch
-                {
-                    "north" => Vector2Int.up,
-                    "east" => Vector2Int.right,
-                    "south" => Vector2Int.down,
-                    "west" => Vector2Int.left,
-                    _ => throw new FormatException("start.facing must be north, east, south, or west.")
-                };
+                if (data.greenCandy < 0 || data.redCandy < 0)
+                    throw new FormatException("Candy counts must be non-negative.");
+                if (data.attemptCount < 0)
+                    throw new FormatException("Attempt count must be non-negative.");
+
+                Vector2Int direction = ReadDirection(data.start.facing, "start.facing");
 
                 var obstacles = new HashSet<Vector2Int>();
                 Cell[] blocked = data.blocked ?? Array.Empty<Cell>();
@@ -86,7 +97,10 @@ namespace FGJ2026
                     Vector2Int cell = ReadCell(source, $"cues[{i}]", data);
                     if (string.IsNullOrWhiteSpace(source.type))
                         throw new FormatException($"cues[{i}].type must identify the cue, e.g. birdsong.");
-                    cues[i] = new CueSource(source.type.Trim(), cell);
+                    Vector2Int cueDirection = string.IsNullOrEmpty(source.direction)
+                        ? Vector2Int.zero
+                        : ReadDirection(source.direction, $"cues[{i}].direction");
+                    cues[i] = new CueSource(source.type.Trim(), cell, cueDirection);
                 }
 
                 map = new PuzzleMap(data, direction, obstacles, cues);
@@ -103,6 +117,15 @@ namespace FGJ2026
             }
         }
 
+        private static Vector2Int ReadDirection(string direction, string field) => direction switch
+        {
+            "north" => Vector2Int.up,
+            "east" => Vector2Int.right,
+            "south" => Vector2Int.down,
+            "west" => Vector2Int.left,
+            _ => throw new FormatException($"{field} must be north, east, south, or west.")
+        };
+
         private static Vector2Int ReadCell(Cell cell, string field, MapData data)
         {
             if (cell == null || cell.x < 0 || cell.x >= data.width || cell.y < 0 || cell.y >= data.height)
@@ -114,12 +137,21 @@ namespace FGJ2026
         {
             public string Type { get; }
             public Vector2Int Cell { get; }
+            public Vector2Int Direction { get; }
 
-            public CueSource(string type, Vector2Int cell)
+            public CueSource(string type, Vector2Int cell, Vector2Int direction = default)
             {
                 Type = type;
                 Cell = cell;
+                Direction = direction;
             }
+        }
+
+        [Serializable]
+        private sealed class LegacyCandyCounts
+        {
+            public int goodBonbons = 0;
+            public int badBonbons = 0;
         }
 
         [Serializable]
@@ -127,6 +159,9 @@ namespace FGJ2026
         {
             public int width = 0;
             public int height = 0;
+            public int greenCandy;
+            public int redCandy;
+            public int attemptCount;
             public StartData start = null;
             public Cell goal = null;
             public Cell[] blocked = null;
@@ -151,6 +186,7 @@ namespace FGJ2026
         public sealed class CueData : Cell
         {
             public string type = null;
+            public string direction;
         }
     }
 }

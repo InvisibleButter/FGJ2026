@@ -10,10 +10,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance => _instance;
     
     private static GameManager _instance;
-    private int _currentLevelIndex;
-    
-    public int CurrentLevelIndex => _currentLevelIndex;
-    
+
     private void Awake()
     {
         if (_instance != null && _instance != this)
@@ -32,8 +29,7 @@ public class GameManager : MonoBehaviour
     {
         DontDestroyOnLoad(gameObject);
     }
-
-
+    
     private void Update()
     {
         #if UNITY_EDITOR
@@ -58,10 +54,8 @@ public class GameManager : MonoBehaviour
         _serviceLocator.InitializeAll();
     }
 
-    public void SelectStartingLevel(int index)
+    public void SelectStartingLevel()
     { 
-        _currentLevelIndex = index;
-        
         SceneManager.LoadSceneAsync("Scenes/MainGame");
     }
 

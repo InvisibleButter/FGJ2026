@@ -8,6 +8,7 @@ namespace FGJ2026
         [SerializeField] private TextAsset[] levels;
 
         public int CurrentLevelIndex { get; private set; } = -1;
+        public PuzzleMap CurrentMap { get; private set; }
 
         public bool LoadNextLevel()
         {
@@ -25,8 +26,9 @@ namespace FGJ2026
                 Debug.LogError($"Could not load level {CurrentLevelIndex} ({mapData.name}): {error}", mapData);
                 return false;
             }
-            
-            ServiceLocator.Instance.GetService<GridService>().LoadMap(map);
+
+            CurrentMap = map;
+            ServiceLocator.Instance.GetService<GridService>().LoadMap(CurrentMap);
             return true;
         }
         

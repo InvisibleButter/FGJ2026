@@ -16,16 +16,18 @@ namespace FGJ2026
         public bool IsGoal { get; }
         public bool HasPreplacedClue { get; }
         public string PlacedClueType { get; }
+        public Vector2Int PlacedClueDirection { get; }
         public CandyType? Candy { get; }
 
         internal GridCellState(bool isBlocked, bool isStart, bool isGoal, bool hasPreplacedClue,
-            string placedClueType, CandyType? candy)
+            string placedClueType, Vector2Int placedClueDirection, CandyType? candy)
         {
             IsBlocked = isBlocked;
             IsStart = isStart;
             IsGoal = isGoal;
             HasPreplacedClue = hasPreplacedClue;
             PlacedClueType = placedClueType;
+            PlacedClueDirection = placedClueDirection;
             Candy = candy;
         }
     }
@@ -35,12 +37,14 @@ namespace FGJ2026
         private readonly PuzzleGridView view;
         private readonly HashSet<Vector2Int> preplacedClueCells = new HashSet<Vector2Int>();
         private readonly Dictionary<Vector2Int, CandyType> candies = new Dictionary<Vector2Int, CandyType>();
-        private readonly Dictionary<Vector2Int, PuzzleMap.CueSource> placedClues =
-            new Dictionary<Vector2Int, PuzzleMap.CueSource>();
+        private readonly Dictionary<Vector2Int, PuzzleMap.CueSource> placedClues = new Dictionary<Vector2Int, PuzzleMap.CueSource>();
 
-        internal GridService(PuzzleGridView view)
+        private readonly PuzzleManager _puzzleManager;
+
+        internal GridService(PuzzleGridView view, PuzzleManager puzzleManager)
         {
             this.view = view;
+            _puzzleManager = puzzleManager;
         }
 
         public PuzzleMap Map { get; private set; }
@@ -50,11 +54,16 @@ namespace FGJ2026
         {
             view.RenderMap(map);
             Map = map;
+         
             candies.Clear();
             placedClues.Clear();
             preplacedClueCells.Clear();
             foreach (var cue in map.Cues)
+            {
                 preplacedClueCells.Add(cue.Cell);
+            }
+
+            _puzzleManager.OnMapLoaded(map);
         }
 
         public bool Contains(Vector2Int cell) => Map != null && Map.Contains(cell);
@@ -68,7 +77,7 @@ namespace FGJ2026
             placedClues.TryGetValue(cell, out var clue);
             CandyType? candy = candies.TryGetValue(cell, out CandyType type) ? type : (CandyType?)null;
             state = new GridCellState(Map.IsBlocked(cell), Map.Start == cell, Map.Goal == cell,
-                preplacedClueCells.Contains(cell), clue.Type, candy);
+                preplacedClueCells.Contains(cell), clue.Type, clue.Direction, candy);
             return true;
         }
 
@@ -96,7 +105,7 @@ namespace FGJ2026
 
         public bool TryPlaceCandy(Vector2Int cell, CandyType type)
         {
-            if ((type != CandyType.Green && type != CandyType.Red) || !CanPlaceAt(cell))
+            if (!CanPlaceAt(cell) || !_puzzleManager.TrySpendCandy(type))
                 return false;
 
             candies.Add(cell, type);
@@ -106,19 +115,24 @@ namespace FGJ2026
 
         public bool TryRemoveCandy(Vector2Int cell)
         {
-            if (!CanPlaceItems || !candies.Remove(cell))
+            if (!CanPlaceItems || !candies.Remove(cell, out CandyType type))
                 return false;
 
+            _puzzleManager.RefundCandy(type);
             view.SetCandy(cell, null);
             return true;
         }
 
-        public bool TryPlaceClue(Vector2Int cell, string type)
+        public bool TryPlaceClue(Vector2Int cell, string type, Vector2Int direction = default)
         {
             if (string.IsNullOrWhiteSpace(type) || !CanPlaceAt(cell))
                 return false;
 
-            placedClues.Add(cell, new PuzzleMap.CueSource(type.Trim(), cell));
+            if (direction != Vector2Int.zero && direction != Vector2Int.up && direction != Vector2Int.right &&
+                direction != Vector2Int.down && direction != Vector2Int.left)
+                return false;
+
+            placedClues.Add(cell, new PuzzleMap.CueSource(type.Trim(), cell, direction));
             view.RenderClues(placedClues.Values);
             return true;
         }

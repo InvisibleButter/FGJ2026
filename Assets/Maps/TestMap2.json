@@ -1,6 +1,8 @@
 {
     "width": 10,
     "height": 7,
+    "greenCandy": 2,
+    "redCandy": 2,
     "start": {
         "x": 0,
         "y": 0,
@@ -48,7 +50,8 @@
         {
             "x": 1,
             "y": 3,
-            "type": "birdsong"
+            "type": "birdsong",
+            "direction": ""
         }
     ]
 }
