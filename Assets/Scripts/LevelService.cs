@@ -1,44 +1,35 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace FGJ2026
 {
-    public sealed class LevelService : IService
+    public sealed class LevelService : MonoBehaviour, IService
     {
-        private readonly TextAsset[] levels;
-        private GridService _gridService;
+        [SerializeField] private TextAsset[] levels;
 
-        internal LevelService(TextAsset[] levels, int startingLevelIndex)
-        {
-            this.levels = levels;
-           
-            _gridService = ServiceLocator.Instance.GetService<GridService>();
-            StartingLevelIndex = startingLevelIndex;
-        }
-
-        public int StartingLevelIndex { get; }
         public int CurrentLevelIndex { get; private set; } = -1;
-        public int LevelCount => levels.Length;
-       
-        internal bool TryLoadLevel(int index)
+
+        public bool LoadNextLevel()
         {
-            if (index < 0 || index >= LevelCount || levels[index] == null)
+            CurrentLevelIndex++;
+            if (CurrentLevelIndex >= levels.Length)
             {
-                Debug.LogError($"The GameManager has no map assigned at level index {index}.");
+                CurrentLevelIndex = 0;
+                SceneManager.LoadSceneAsync("Scenes/StarterMenu");
                 return false;
             }
-
-            TextAsset asset = levels[index];
-            if (!PuzzleMap.TryParse(asset.text, out PuzzleMap map, out string error))
+            
+            var mapData = levels[CurrentLevelIndex];
+            if (!PuzzleMap.TryParse(mapData.text, out PuzzleMap map, out string error))
             {
-                Debug.LogError($"Could not load level {index + 1} ({asset.name}): {error}", asset);
+                Debug.LogError($"Could not load level {CurrentLevelIndex} ({mapData.name}): {error}", mapData);
                 return false;
             }
-
-            _gridService.LoadMap(map);
-            CurrentLevelIndex = index;
+            
+            ServiceLocator.Instance.GetService<GridService>().LoadMap(map);
             return true;
         }
-
+        
         public void Initialize()
         {
             IsInitialized = true;

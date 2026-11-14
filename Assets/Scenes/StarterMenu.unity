@@ -2791,6 +2791,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2120146814}
   - component: {fileID: 2120146813}
+  - component: {fileID: 2120146815}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -2810,8 +2811,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e58e8ea726672de41be92d454145c4a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
-  levels: []
-  puzzleGridView: {fileID: 0}
 --- !u!4 &2120146814
 Transform:
   m_ObjectHideFlags: 0
@@ -2827,6 +2826,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2120146815
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2120146812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21144bcc555b488aaa6a323bf3d36986, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FGJ2026.LevelService
+  levels:
+  - {fileID: 4900000, guid: 8217c77ed53844f5ae1ed58dc3728bb0, type: 3}
+  - {fileID: 4900000, guid: 46a5488f00f6b87438ee8e811fef6797, type: 3}
 --- !u!1 &2120198880
 GameObject:
   m_ObjectHideFlags: 0

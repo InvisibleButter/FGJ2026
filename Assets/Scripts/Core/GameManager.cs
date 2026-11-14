@@ -1,5 +1,7 @@
+using System;
 using FGJ2026;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
@@ -29,6 +31,17 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         DontDestroyOnLoad(gameObject);
+    }
+
+
+    private void Update()
+    {
+        #if UNITY_EDITOR
+        if (Keyboard.current?.spaceKey.wasPressedThisFrame == true)
+        {
+            ServiceLocator.Instance.GetService<LevelService>().LoadNextLevel();
+        }
+        #endif
     }
 
     private void RegisterServices()
