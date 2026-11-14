@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour
         if (_instance != null && _instance != this)
         {
             Destroy(gameObject);
+            return;
         }
         else
         {
@@ -56,7 +57,7 @@ public class GameManager : MonoBehaviour
 
     public void SelectStartingLevel()
     { 
-        SceneManager.LoadSceneAsync("Scenes/MainGame");
+        SceneManager.LoadSceneAsync("MainGame");
     }
 
     protected virtual void AddAdditionalServices() { }

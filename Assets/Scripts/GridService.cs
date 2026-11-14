@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace FGJ2026
 {
+    [Serializable]
     public enum CandyType
     {
         Green,
@@ -87,6 +89,18 @@ namespace FGJ2026
         {
             cell = (Vector2Int)view.Grid.WorldToCell(position);
             return Contains(cell);
+        }
+
+        public bool TryGetCellAtScreenPosition(Camera camera, Vector2 screenPosition, out Vector2Int cell)
+        {
+            cell = default;
+            if (Map == null || !camera.pixelRect.Contains(screenPosition))
+                return false;
+
+            var boardPlane = new Plane(view.Grid.transform.forward, GetCellCenterWorld(Map.Start));
+            Ray ray = camera.ScreenPointToRay(screenPosition);
+            return boardPlane.Raycast(ray, out float distance) &&
+                TryGetCellAtWorldPosition(ray.GetPoint(distance), out cell);
         }
 
         public IEnumerable<PuzzleMap.CueSource> GetCuesAt(Vector2Int cell)

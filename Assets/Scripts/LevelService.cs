@@ -15,8 +15,7 @@ namespace FGJ2026
             CurrentLevelIndex++;
             if (CurrentLevelIndex >= levels.Length)
             {
-                CurrentLevelIndex = 0;
-                SceneManager.LoadSceneAsync("Scenes/StarterMenu");
+                ReturnToMenu();
                 return false;
             }
             
@@ -32,6 +31,13 @@ namespace FGJ2026
             return true;
         }
         
+        internal void ReturnToMenu()
+        {
+            CurrentLevelIndex = -1;
+            CurrentMap = null;
+            SceneManager.LoadSceneAsync("StarterMenu");
+        }
+
         public void Initialize()
         {
             IsInitialized = true;

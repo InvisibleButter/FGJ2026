@@ -3,6 +3,7 @@
     "height": 7,
     "greenCandy": 2,
     "redCandy": 2,
+    "attemptCount": 2,
     "start": {
         "x": 0,
         "y": 0,

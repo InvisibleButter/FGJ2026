@@ -1,16 +1,17 @@
 using System.Collections.Generic;
 using FGJ2026;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class PuzzleManager : MonoBehaviour, IService
 {
     [SerializeField] private PuzzleGridView puzzleGridView;
+   
     private LevelService _levelService;
     private GridService _gridService;
+    private CandyPlacementService _candyPlacement;
     private TrackedGameState _trackedGameState;
     
-    public Phase CurrentPhase { get; private set; }
+    public Phase CurrentPhase { get; private set; } = Phase.LoadFailed;
     
     private void Start()
     {
@@ -21,7 +22,7 @@ public class PuzzleManager : MonoBehaviour, IService
     {
         _gridService = new GridService(puzzleGridView, this);
         ServiceLocator.Instance.Add(_gridService);
-        
+
         _levelService = ServiceLocator.Instance.GetService<LevelService>();
         if (!_levelService.LoadNextLevel())
         {
@@ -30,30 +31,38 @@ public class PuzzleManager : MonoBehaviour, IService
             return;
         }
 
+        var services = GetComponentsInChildren<IService>();
+        foreach(var service in services)
+        {
+            ServiceLocator.Instance.Add(service);
+        }
+        
+        _candyPlacement = ServiceLocator.Instance.GetService<CandyPlacementService>();
+        _candyPlacement.Configure(this, _gridService);
+        
         ChangePhase(Phase.Planning);
         IsInitialized = true;
     }
 
+    public int GetRemainingCandy(CandyType type) => _trackedGameState?.GetRemainingCandy(type) ?? 0;
+
     private void ChangePhase(Phase nextPhase)
     {
         CurrentPhase = nextPhase;
-        _gridService.CanPlaceItems = false;
+        _gridService.CanPlaceItems = nextPhase == Phase.Planning;
+        _candyPlacement.ToggleUI(nextPhase == Phase.Planning);
         
         switch (nextPhase)
         {
-            case Phase.Planning:
-                _gridService.CanPlaceItems = true;
-                break;
-            case Phase.Running:
-                break;
             case Phase.AttemptFinished:
                 ChangePhase(_trackedGameState.ReduceAttemptsLeft() ? Phase.Planning : Phase.LevelFailed);
                 break;
             case Phase.LevelCleared:
-                _levelService.LoadNextLevel();
+                if (!_levelService.LoadNextLevel())
+                    ChangePhase(Phase.LoadFailed);
                 break;
             case Phase.LevelFailed:
-                SceneManager.LoadSceneAsync("Scenes/StarterMenu");
+                _levelService.ReturnToMenu();
                 break;
         }
     }
@@ -61,6 +70,8 @@ public class PuzzleManager : MonoBehaviour, IService
     internal void OnMapLoaded(PuzzleMap map)
     {
         _trackedGameState = new TrackedGameState(map);
+        if (IsInitialized)
+            ChangePhase(Phase.Planning);
     }
 
     internal bool TrySpendCandy(CandyType type) => _trackedGameState.TrySpendCandy(type);
@@ -70,6 +81,12 @@ public class PuzzleManager : MonoBehaviour, IService
     public void DeInitialize()
     {
         IsInitialized = false;
+    }
+
+    private void OnDestroy()
+    {
+        if (IsInitialized)
+            DeInitialize();
     }
 
     public bool IsInitialized { get; set; }
