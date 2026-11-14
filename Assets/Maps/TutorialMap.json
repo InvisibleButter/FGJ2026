@@ -1,0 +1,15 @@
+{
+  "width": 8,
+  "height": 6,
+  "start": { "x": 1, "y": 0, "facing": "north" },
+  "goal": { "x": 5, "y": 3 },
+  "blocked": [
+    { "x": 3, "y": 1 },
+    { "x": 3, "y": 2 },
+    { "x": 5, "y": 4 },
+    { "x": 6, "y": 4 }
+  ],
+  "cues": [
+    { "type": "birdsong", "x": 7, "y": 3 }
+  ]
+}

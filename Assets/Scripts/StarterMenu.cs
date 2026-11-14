@@ -14,9 +14,21 @@ namespace FGJ2026
         [SerializeField] private UnityEngine.UI.Button creditsButton;
         [SerializeField] private UnityEngine.UI.Button backButton;
 
+        private AsyncOperation gameLoad;
+
         public void StartGame()
         {
-            SceneManager.LoadSceneAsync(MainGameScene);
+            StartGameAtLevel(0);
+        }
+
+        public void StartGameAtLevel(int levelIndex)
+        {
+            if (gameLoad != null)
+                return;
+
+            gameLoad = SceneManager.LoadSceneAsync(MainGameScene);
+            if (gameLoad != null)
+                GameManager.SelectStartingLevel(levelIndex);
         }
 
         public void ShowCredits()
