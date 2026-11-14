@@ -66,8 +66,6 @@ public class CandyPlacementService : MonoBehaviour, IService
         }
         
         var mouse = Mouse.current;
-        if (!IsInitialized || puzzleManager.CurrentPhase != Phase.Planning || mouse == null)
-            return;
 
         if (selectionMap != gridService.Map || (selectedCandy.HasValue && puzzleManager.GetRemainingCandy(selectedCandy.Value) == 0))
         {
