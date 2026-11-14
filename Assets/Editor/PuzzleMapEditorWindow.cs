@@ -45,6 +45,9 @@ namespace FGJ2026.Editor
         private Sprite groundPreview;
         private Sprite alternateGroundPreview;
         private Sprite obstaclePreview;
+        private RuleTile grassRule;
+        private Scene grassPreviewScene;
+        private Tilemap grassPreviewMap;
 
         [MenuItem("Tools/FGJ2026/Puzzle Map Editor")]
         private static void Open()
@@ -66,6 +69,7 @@ namespace FGJ2026.Editor
                 AssetDatabase.GUIDToAssetPath(DefaultPaletteGuid));
             if (palette != null)
             {
+                grassRule = palette.Ground as RuleTile;
                 groundPreview = GetPreview(palette.Ground, palette, palette.GroundRegion);
                 alternateGroundPreview = GetPreview(palette.AlternateGround, palette, palette.AlternateGroundRegion);
                 obstaclePreview = GetPreview(palette.Obstacle, palette, palette.ObstacleRegion);
@@ -190,6 +194,7 @@ namespace FGJ2026.Editor
 
         private void RebuildBoard()
         {
+            RebuildGrassPreview();
             board.Clear();
             for (int y = draft.height - 1; y >= 0; y--)
             {
@@ -199,7 +204,7 @@ namespace FGJ2026.Editor
                 {
                     var cell = new Vector2Int(x, y);
                     var button = new Button(() => PaintCell(cell)) { userData = cell };
-                    button.style.width = 34;
+                    button.style.width = 32;
                     button.style.height = 32;
                     button.style.marginLeft = 1;
                     button.style.marginRight = 1;
@@ -227,12 +232,17 @@ namespace FGJ2026.Editor
                     string description = "Ground";
                     string symbol = "";
                     Color color = GroundColor;
-                    Sprite preview = (cell.x + cell.y) % 2 == 0 ? groundPreview : alternateGroundPreview;
+                    var tilePosition = (Vector3Int)cell;
+                    Sprite preview = grassPreviewMap != null
+                        ? grassPreviewMap.GetSprite(tilePosition)
+                        : (cell.x + cell.y) % 2 == 0 ? groundPreview : alternateGroundPreview;
+                    bool showsGrass = grassPreviewMap != null;
                     if (cueRows.Contains(cell.y))
                     {
                         color = CoverageColor;
                         description = "Cue coverage";
                         preview = null;
+                        showsGrass = false;
                     }
                     if (obstacles.Contains(cell))
                     {
@@ -240,6 +250,7 @@ namespace FGJ2026.Editor
                         symbol = "X";
                         description = "Obstacle";
                         preview = obstaclePreview;
+                        showsGrass = false;
                     }
                     if (sources.Contains(cell))
                     {
@@ -247,6 +258,7 @@ namespace FGJ2026.Editor
                         symbol = "C";
                         description = string.Join(", ", sources[cell].Select(cue => cue.type));
                         preview = null;
+                        showsGrass = false;
                     }
                     if (cell == draft.start.Position)
                     {
@@ -254,6 +266,7 @@ namespace FGJ2026.Editor
                         symbol = draft.start.facing switch { "north" => "↑", "east" => "→", "south" => "↓", _ => "←" };
                         description = $"Start facing {draft.start.facing}";
                         preview = null;
+                        showsGrass = false;
                     }
                     if (cell == draft.goal.Position)
                     {
@@ -261,16 +274,45 @@ namespace FGJ2026.Editor
                         symbol = "G";
                         description = "Goal";
                         preview = null;
+                        showsGrass = false;
                     }
 
                     button.style.backgroundColor = color;
                     button.style.backgroundImage = preview != null
                         ? new StyleBackground(Background.FromSprite(preview))
                         : new StyleBackground(StyleKeyword.None);
+                    Matrix4x4 transform = showsGrass ? grassPreviewMap.GetTransformMatrix(tilePosition) : Matrix4x4.identity;
+                    float angle = Mathf.Atan2(transform.m10, transform.m00) * Mathf.Rad2Deg;
+                    button.style.rotate = new Rotate(-angle);
+                    button.style.scale = new Scale(new Vector2(1, transform.determinant < 0 ? -1 : 1));
                     button.text = symbol;
                     button.tooltip = $"({cell.x}, {cell.y}) {description}";
                 }
             }
+        }
+
+        private void RebuildGrassPreview()
+        {
+            if (grassRule == null)
+                return;
+
+            if (grassPreviewMap == null)
+            {
+                grassPreviewScene = EditorSceneManager.NewPreviewScene();
+                var grid = EditorUtility.CreateGameObjectWithHideFlags("Grass Preview", HideFlags.HideAndDontSave, typeof(Grid));
+                SceneManager.MoveGameObjectToScene(grid, grassPreviewScene);
+                var layer = EditorUtility.CreateGameObjectWithHideFlags("Ground", HideFlags.HideAndDontSave, typeof(Tilemap));
+                SceneManager.MoveGameObjectToScene(layer, grassPreviewScene);
+                layer.transform.SetParent(grid.transform, false);
+                grassPreviewMap = layer.GetComponent<Tilemap>();
+            }
+
+            grassPreviewMap.ClearAllTiles();
+            var tiles = new TileBase[draft.width * draft.height];
+            Array.Fill(tiles, grassRule);
+            var bounds = new BoundsInt(0, 0, 0, draft.width, draft.height, 1);
+            grassPreviewMap.SetTilesBlock(bounds, tiles);
+            grassPreviewMap.RefreshAllTiles();
         }
 
         private Sprite GetPreview(TileBase tile, PuzzleTilePalette palette, RectInt region)
@@ -288,6 +330,11 @@ namespace FGJ2026.Editor
 
         private void ReleasePreviews()
         {
+            if (grassPreviewScene.IsValid())
+                EditorSceneManager.ClosePreviewScene(grassPreviewScene);
+            grassPreviewScene = default;
+            grassPreviewMap = null;
+            grassRule = null;
             foreach (Sprite sprite in previewSprites)
                 DestroyImmediate(sprite);
             previewSprites.Clear();

@@ -6,8 +6,9 @@ namespace FGJ2026
     [CreateAssetMenu(fileName = "PuzzleTilePalette", menuName = "FGJ2026/Puzzle Tile Palette")]
     public sealed class PuzzleTilePalette : ScriptableObject
     {
-        [Tooltip("The ground tiles alternate. Leave the alternate empty to use the same tile everywhere.")]
+        [Tooltip("A Rule Tile fills the ground layer and selects its sprite from neighboring cells.")]
         [SerializeField] private TileBase ground;
+        [Tooltip("Alternates with regular ground tiles. For a Rule Tile, set variations in the rules.")]
         [SerializeField] private TileBase alternateGround;
         [SerializeField] private TileBase obstacle;
         [SerializeField] private TileBase cueCoverage;
@@ -23,7 +24,7 @@ namespace FGJ2026
         [SerializeField] private TileRegion obstacleRegion;
 
         public TileBase Ground => ground;
-        public TileBase AlternateGround => alternateGround != null ? alternateGround : ground;
+        public TileBase AlternateGround => ground is RuleTile || alternateGround == null ? ground : alternateGround;
         public TileBase Obstacle => obstacle;
         public TileBase CueCoverage => cueCoverage;
         public TileBase CueSource => cueSource;

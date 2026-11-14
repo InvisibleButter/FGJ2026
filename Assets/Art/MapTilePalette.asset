@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c36575b77cae4194a7653467a369ddda, type: 3}
   m_Name: MapTilePalette
   m_EditorClassIdentifier:
-  ground: {fileID: 0}
+  ground: {fileID: 11400000, guid: d5f15689d0e134449afb930d4bced136, type: 2}
   alternateGround: {fileID: 0}
   obstacle: {fileID: 0}
   cueCoverage: {fileID: 0}
