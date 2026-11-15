@@ -46,6 +46,8 @@ namespace FGJ2026.Board
             public AudioSource AudioSource;
             public BoardArt.ColorVariant Variant;
             public Vector2Int Facing;
+            public readonly Queue<AudioClip> PendingSounds = new Queue<AudioClip>();
+            public AnimalSoundCue LastSoundCue;
             public Transform Arrow;
             public Vector3 Position;
             public Vector3 Target;
@@ -212,15 +214,40 @@ namespace FGJ2026.Board
             return selected;
         }
 
-        public AudioSource PlayAnimalSound(Animal animal, AnimalSoundCue cue)
+        public AudioSource PlayAnimalSound(Animal animal, AnimalSoundCue cue, bool queueIfBusy = true)
         {
-            AudioSource source = animals[animal.Index].AudioSource;
-            return sound != null && sound.TryPlayAnimalSound(source, animal.Color, cue) ? source : null;
+            AnimalView view = animals[animal.Index];
+            AudioSource source = view.AudioSource;
+            if (source == null)
+                return null;
+
+            bool busy = source.isPlaying || view.PendingSounds.Count > 0;
+            if (busy && (!queueIfBusy || cue == view.LastSoundCue))
+                return null;
+
+            AudioClip clip = sound.PickAnimalClip(animal.Color, cue);
+            if (clip == null)
+                return null;
+
+            view.LastSoundCue = cue;
+            view.PendingSounds.Enqueue(clip);
+            PlayNextAnimalSound(view);
+            return source;
+        }
+
+        private static void PlayNextAnimalSound(AnimalView view)
+        {
+            AudioSource source = view.AudioSource;
+            if (view.PendingSounds.Count == 0 || source == null || source.isPlaying)
+                return;
+
+            source.clip = view.PendingSounds.Dequeue();
+            source.Play();
         }
 
         public AudioSource StartPlanningSong(Animal animal)
         {
-            AudioSource source = PlayAnimalSound(animal, AnimalSoundCue.Sing);
+            AudioSource source = PlayAnimalSound(animal, AnimalSoundCue.Sing, queueIfBusy: false);
             if (source == null)
                 return null;
 
@@ -253,6 +280,7 @@ namespace FGJ2026.Board
         {
             foreach (AnimalView view in animals.Values)
             {
+                view.PendingSounds.Clear();
                 if (view.AudioSource != null)
                     view.AudioSource.Stop();
             }
@@ -286,12 +314,15 @@ namespace FGJ2026.Board
             }
         }
 
-        /// <summary>Slides the animals towards their squares. Call every frame.</summary>
+        /// <summary>Updates animal movement and sound playback. Call every frame.</summary>
         public void Tick(float deltaTime)
         {
             float step = deltaTime / MoveDuration;
             foreach (AnimalView view in animals.Values)
+            {
                 view.Position = Vector3.MoveTowards(view.Position, view.Target, step);
+                PlayNextAnimalSound(view);
+            }
             ApplyPositions();
             UpdateNotes(deltaTime);
             UpdateEmotes(deltaTime);
@@ -460,22 +491,12 @@ namespace FGJ2026.Board
             BoardArt.ColorVariant variant = art != null ? art.VariantFor(setup.Color) : null;
             RuntimeAnimatorController controller = variant?.animal != null ? variant.AnimalFacing(setup.Facing) : art != null ? art.animal : null;
 
-            AudioSource audioSource = null;
-            if (sound != null)
-            {
-                audioSource = root.AddComponent<AudioSource>();
-                audioSource.playOnAwake = false;
-                audioSource.loop = false;
-                audioSource.spatialBlend = 0f;
-            }
-
             // Colours without their own art get a coloured spot under the animal.
             if (variant?.animal == null)
             {
                 SpriteRenderer spot = CreateSprite("Colour spot", visuals.transform, PixelSprites.Shadow, SpotOrder);
                 spot.color = Palette.Of(setup.Color);
             }
-
             Animator animator = null;
             if (controller != null)
             {
@@ -501,8 +522,8 @@ namespace FGJ2026.Board
                 Root = root,
                 Visuals = visuals,
                 Animator = animator,
+                AudioSource = sound != null ? CreateAnimalAudioSource(root) : null,
                 Emote = emote,
-                AudioSource = audioSource,
                 Variant = variant,
                 Facing = setup.Facing,
                 Arrow = arrow.transform,
@@ -514,6 +535,15 @@ namespace FGJ2026.Board
                 view.Sings |= rule.Kind == RuleKind.Sing;
             Play(view, Idle);
             return view;
+        }
+
+        private static AudioSource CreateAnimalAudioSource(GameObject root)
+        {
+            AudioSource source = root.AddComponent<AudioSource>();
+            source.playOnAwake = false;
+            source.loop = false;
+            source.spatialBlend = 0f;
+            return source;
         }
 
         private static SpriteRenderer CreateSprite(string name, Transform parent, Sprite sprite, int order,

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace FGJ2026
 {
-    public enum AnimalSoundCue { Sing, Plopp, Sad, Happy, Eat, Quak }
+    public enum AnimalSoundCue { Sing, Plopp, Sad, Happy, Eat, Quak, Move }
 
     [CreateAssetMenu(menuName = "FGJ2026/Animal Sound Profile", fileName = "AnimalSoundProfile")]
     public sealed class AnimalSoundProfile : ScriptableObject
@@ -16,6 +16,7 @@ namespace FGJ2026
         [SerializeField] private AudioClip happy;
         [SerializeField] private AudioClip[] eat = Array.Empty<AudioClip>();
         [SerializeField] private AudioClip quak;
+        [SerializeField] private AudioClip move;
 
         public AnimalColor Color => color;
 
@@ -27,6 +28,7 @@ namespace FGJ2026
             AnimalSoundCue.Happy => happy,
             AnimalSoundCue.Eat => PickVariant(eat),
             AnimalSoundCue.Quak => quak,
+            AnimalSoundCue.Move => move,
             _ => null
         };
 

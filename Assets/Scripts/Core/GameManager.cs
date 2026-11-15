@@ -71,14 +71,27 @@ namespace FGJ2026
             ServiceLocator.Instance.Add(Progress);
             ServiceLocator.Instance.Add(Sound);
             ServiceLocator.Instance.InitializeAll();
+            SceneManager.sceneLoaded += UpdateSceneAudio;
+            UpdateSceneAudio(SceneManager.GetActiveScene(), LoadSceneMode.Single);
         }
 
         private void OnApplicationQuit() => quitting = true;
 
         private void OnDestroy()
         {
+            SceneManager.sceneLoaded -= UpdateSceneAudio;
             if (instance == this)
                 instance = null;
+        }
+
+        private void UpdateSceneAudio(Scene scene, LoadSceneMode mode)
+        {
+            Camera camera = Camera.main;
+            if (camera != null && FindFirstObjectByType<AudioListener>() == null)
+                camera.gameObject.AddComponent<AudioListener>();
+
+            if (scene.name != PuzzleScene)
+                Sound.PlayMusic(MusicTrack.Menu);
         }
 
         public void OpenMenu()

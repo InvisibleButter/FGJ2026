@@ -251,6 +251,7 @@ namespace FGJ2026
             if (!sim.StartDay())
                 return;
             StopPlanningAudio();
+            game.Sound.PlayMusic(MusicTrack.Simulation);
             tickTimer = secondsPerTick - startDelay;
             SetMessage($"Day {sim.DayNumber} is running...");
             RefreshAll();
@@ -333,6 +334,7 @@ namespace FGJ2026
         private void StartPlanningAudio()
         {
             StopPlanningAudio();
+            game.Sound.PlayMusic(MusicTrack.Planning);
             planningQuaks = StartCoroutine(PlayPlanningQuaks());
             foreach (Animal animal in sim.Animals)
             {
@@ -368,7 +370,7 @@ namespace FGJ2026
                 if (animal == null)
                     continue;
 
-                planningQuakSource = board.PlayAnimalSound(animal, AnimalSoundCue.Quak);
+                planningQuakSource = board.PlayAnimalSound(animal, AnimalSoundCue.Quak, queueIfBusy: false);
                 if (planningQuakSource != null)
                     yield return new WaitWhile(() => planningQuakSource != null && planningQuakSource.isPlaying);
                 planningQuakSource = null;
@@ -421,6 +423,9 @@ namespace FGJ2026
             foreach (KeyValuePair<int, AnimalAction> entry in report.Actions)
             {
                 Animal animal = sim.Animals[entry.Key];
+                if (entry.Value is AnimalAction.Move or AnimalAction.ReachFlag)
+                    board.PlayAnimalSound(animal, AnimalSoundCue.Move);
+
                 switch (entry.Value)
                 {
                     case AnimalAction.LeaveMap:
