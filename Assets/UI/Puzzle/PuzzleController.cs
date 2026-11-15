@@ -38,6 +38,9 @@ namespace FGJ2026
         private const string PlanningBanner = "Planning Phase";
         private const float BannerPositionTolerance = 0.5f;
         private const float PlanningSongDelay = 0.5f;
+        private const string ResultStarPending = "result-star--pending";
+        private const long FirstStarDelayMs = 120;
+        private const long StarRevealIntervalMs = 280;
 
         private GameManager game;
         private TestRun test;
@@ -634,9 +637,26 @@ namespace FGJ2026
             playAgainButton.EnableInClassList(Hidden, !won);
             rewindDayButton.EnableInClassList(Hidden, won);
             restartButton.EnableInClassList(Hidden, won);
-            ShowPhaseBanner(won ?"Level Finished" : "Game Over", () => resultOverlay.RemoveFromClassList(Hidden));
+            ShowPhaseBanner(won ? "Level Finished" : "Game Over", ShowResult);
         }
 
-        private void HideResult() => resultOverlay?.AddToClassList(Hidden);
+        private void ShowResult()
+        {
+            long delay = FirstStarDelayMs;
+            foreach (VisualElement row in resultStars.Children())
+            {
+                row.AddToClassList(ResultStarPending);
+                row.schedule.Execute(() => row.RemoveFromClassList(ResultStarPending)).StartingIn(delay);
+                delay += StarRevealIntervalMs;
+            }
+
+            resultOverlay.RemoveFromClassList(Hidden);
+        }
+
+        private void HideResult()
+        {
+            resultOverlay?.AddToClassList(Hidden);
+            resultStars?.Clear();
+        }
     }
 }

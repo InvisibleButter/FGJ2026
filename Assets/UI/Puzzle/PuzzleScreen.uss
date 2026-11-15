@@ -358,6 +358,27 @@
     -unity-text-align: middle-center;
 }
 
+.result-card .star-row {
+    transition-duration: 0.14s;
+    transition-timing-function: ease-out;
+}
+
+.result-card .star-row > .star {
+    scale: 1 1;
+    transition-duration: 0.26s;
+    transition-timing-function: ease-out-back;
+}
+
+.result-star--pending .star-row {
+    opacity: 0;
+    transition-duration: 0s;
+}
+
+.result-star--pending .star-row > .star {
+    scale: 0.3 0.3;
+    transition-duration: 0s;
+}
+
 .result-buttons {
     flex-direction: row;
     justify-content: center;
