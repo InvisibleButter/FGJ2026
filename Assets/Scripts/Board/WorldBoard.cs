@@ -33,7 +33,9 @@ namespace FGJ2026.Board
         private sealed class AnimalView
         {
             public GameObject Root;
+            public GameObject Visuals;
             public Animator Animator;
+            public AudioSource AudioSource;
             public Transform Arrow;
             public Vector3 Position;
             public Vector3 Target;
@@ -43,6 +45,7 @@ namespace FGJ2026.Board
 
         private readonly LevelDefinition level;
         private readonly BoardArt art;
+        private readonly SoundService sound;
         private readonly Tilemap songs, hints;
         private readonly Tile whiteTile, dotTile;
         private readonly Tile[] noteTiles;
@@ -62,9 +65,10 @@ namespace FGJ2026.Board
         /// <summary>The board in world units, with one square of margin (room for facing arrows at the edge).</summary>
         public Rect FramingRect => new Rect(Root.transform.position.x - 1f, Root.transform.position.y - 1f, level.Width + 2f, level.Height + 2f);
 
-        public WorldBoard(LevelDefinition level, Vector3 origin, bool interactive)
+        public WorldBoard(LevelDefinition level, Vector3 origin, bool interactive, SoundService sound = null)
         {
             this.level = level;
+            this.sound = sound;
             art = BoardArt.Load();
 
             Root = new GameObject($"Board - {level.Name}");
@@ -133,7 +137,7 @@ namespace FGJ2026.Board
             foreach (Animal animal in sim.Animals)
             {
                 AnimalView view = animals[animal.Index];
-                view.Root.SetActive(!animal.OffMap);
+                view.Visuals.SetActive(!animal.OffMap);
                 view.Arrow.gameObject.SetActive(!animal.OffMap && !animal.OnFlag);
                 view.Arrow.localEulerAngles = new Vector3(0f, 0f, Directions.Angle(animal.Facing));
 
@@ -153,20 +157,35 @@ namespace FGJ2026.Board
 
         public void CapturePreviousSim(PuzzleSimulation sim) => previousSim = sim.CreateSnapshot();
 
-        public AnimalColor? PickIdleAnimalColor()
+        public Animal PickIdleAnimal()
         {
             if (lastSim == null)
                 return null;
 
-            AnimalColor? selected = null;
+            Animal selected = null;
             int count = 0;
             foreach (Animal animal in lastSim.Animals)
             {
                 AnimalView view = animals[animal.Index];
-                if (view.State == Idle && view.Root.activeInHierarchy && Random.Range(0, ++count) == 0)
-                    selected = animal.Color;
+                if (view.State == Idle && view.Visuals.activeInHierarchy && Random.Range(0, ++count) == 0)
+                    selected = animal;
             }
             return selected;
+        }
+
+        public AudioSource PlayAnimalSound(Animal animal, AnimalSoundCue cue)
+        {
+            AudioSource source = animals[animal.Index].AudioSource;
+            return sound != null && sound.TryPlayAnimalSound(source, animal.Color, cue) ? source : null;
+        }
+
+        public void StopAnimalSounds()
+        {
+            foreach (AnimalView view in animals.Values)
+            {
+                if (view.AudioSource != null)
+                    view.AudioSource.Stop();
+            }
         }
 
         /// <summary>Plays the animations for what the animals did in a tick.</summary>
@@ -185,7 +204,7 @@ namespace FGJ2026.Board
                     case AnimalAction.Wait:
                         Play(view, Sad);
                         if (previousSim?.Animals[animal.Index].LastAction != AnimalAction.Wait)
-                            ServiceLocator.Instance.GetService<SoundService>().PlayAnimalSound(animal.Color, AnimalSoundCue.Sad);
+                            PlayAnimalSound(animal, AnimalSoundCue.Sad);
                         break;
                     default: Play(view, view.Sings && !animal.OnFlag ? Sing : animal.OnFlag ? Love : Idle); break;
                 }
@@ -354,18 +373,29 @@ namespace FGJ2026.Board
             var root = new GameObject($"{setup.Color} animal");
             root.transform.SetParent(objects, false);
 
-            SpriteRenderer spot = CreateSprite("Colour spot", root.transform, PixelSprites.Shadow, SpotOrder);
+            var visuals = new GameObject("Visuals");
+            visuals.transform.SetParent(root.transform, false);
+            SpriteRenderer spot = CreateSprite("Colour spot", visuals.transform, PixelSprites.Shadow, SpotOrder);
             spot.color = Palette.Of(setup.Color);
+
+            AudioSource audioSource = null;
+            if (sound != null)
+            {
+                audioSource = root.AddComponent<AudioSource>();
+                audioSource.playOnAwake = false;
+                audioSource.loop = false;
+                audioSource.spatialBlend = 0f;
+            }
 
             Animator animator = null;
             if (art != null && art.animal != null)
             {
-                SpriteRenderer body = CreateSprite("Body", root.transform, null, AnimalOrder, art.animal);
+                SpriteRenderer body = CreateSprite("Body", visuals.transform, null, AnimalOrder, art.animal);
                 animator = body.GetComponent<Animator>();
             }
             else
             {
-                SpriteRenderer body = CreateSprite("Body", root.transform, PixelSprites.Disc, AnimalOrder);
+                SpriteRenderer body = CreateSprite("Body", visuals.transform, PixelSprites.Disc, AnimalOrder);
                 body.color = Palette.Of(setup.Color);
             }
 
@@ -377,7 +407,9 @@ namespace FGJ2026.Board
             var view = new AnimalView
             {
                 Root = root,
+                Visuals = visuals,
                 Animator = animator,
+                AudioSource = audioSource,
                 Arrow = arrow.transform,
                 Position = start,
                 Target = start,

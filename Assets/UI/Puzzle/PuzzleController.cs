@@ -39,7 +39,6 @@ namespace FGJ2026
         private const float BannerPositionTolerance = 0.5f;
 
         private GameManager game;
-        private SoundService sound;
         private TestRun test;
         private LevelDefinition level;
         private int levelIndex;
@@ -47,6 +46,7 @@ namespace FGJ2026
         private ItemType? selectedItem;
         private float tickTimer;
         private Coroutine planningQuaks;
+        private AudioSource planningQuakSource;
 
         private WorldBoard board;
         private Camera boardCamera;
@@ -67,7 +67,6 @@ namespace FGJ2026
         private void Start()
         {
             game = GameManager.Instance;
-            sound = game.Sound;
             test = game.CurrentTest;
             levelIndex = Mathf.Clamp(game.SelectedLevelIndex, 0, Mathf.Max(0, game.Levels.Count - 1));
             level = test != null ? test.Level : game.Levels.Get(levelIndex);
@@ -81,7 +80,7 @@ namespace FGJ2026
             BindUi();
             BuildLevelUi();
 
-            board = new WorldBoard(level, Vector3.zero, true);
+            board = new WorldBoard(level, Vector3.zero, true, game.Sound);
             boardCamera = Camera.main;
             boardCamera.enabled = false; // shown once it is framed (after the first UI layout)
 
@@ -98,7 +97,7 @@ namespace FGJ2026
         {
             CancelPhaseBanner();
             StopPlanningQuaks();
-            sound?.StopAnimalSounds();
+            board?.StopAnimalSounds();
         }
 
         private void Update()
@@ -238,7 +237,7 @@ namespace FGJ2026
 
         private void Restart()
         {
-            sound.StopAnimalSounds();
+            board.StopAnimalSounds();
             sim = new PuzzleSimulation(level);
             selectedItem = level.ItemTypes.Count > 0 ? level.ItemTypes[0] : (ItemType?)null;
             HideResult();
@@ -263,7 +262,7 @@ namespace FGJ2026
         {
             if (sim.Phase != PuzzlePhase.Running)
                 return;
-            sound.StopAnimalSounds();
+            board.StopAnimalSounds();
             TickReport last = sim.RunToEndOfDay();
             RefreshAll();
             if (last?.DayEnded != null)
@@ -272,7 +271,7 @@ namespace FGJ2026
 
         private void Rewind()
         {
-            sound.StopAnimalSounds();
+            board.StopAnimalSounds();
             PuzzlePhase previousPhase = sim.Phase;
             sim.Rewind();
             tickTimer = 0f;
@@ -343,7 +342,9 @@ namespace FGJ2026
 
             StopCoroutine(planningQuaks);
             planningQuaks = null;
-            sound.StopIdleSound();
+            if (planningQuakSource != null)
+                planningQuakSource.Stop();
+            planningQuakSource = null;
         }
 
         private IEnumerator PlayPlanningQuaks()
@@ -352,12 +353,14 @@ namespace FGJ2026
             {
                 yield return new WaitForSeconds(UnityEngine.Random.Range(1.5f, 4f));
 
-                AnimalColor? color = board.PickIdleAnimalColor();
-                if (!color.HasValue)
+                Animal animal = board.PickIdleAnimal();
+                if (animal == null)
                     continue;
 
-                sound.PlayIdleSound(color.Value);
-                yield return new WaitWhile(() => sound.IsIdleSoundPlaying);
+                planningQuakSource = board.PlayAnimalSound(animal, AnimalSoundCue.Quak);
+                if (planningQuakSource != null)
+                    yield return new WaitWhile(() => planningQuakSource != null && planningQuakSource.isPlaying);
+                planningQuakSource = null;
             }
             planningQuaks = null;
         }
@@ -385,23 +388,23 @@ namespace FGJ2026
             {
                 if (trigger.Rule.Kind == RuleKind.Sing)
                 {
-                    sound.PlayAnimalSound(trigger.Animal.Color, AnimalSoundCue.Sing);
+                    board.PlayAnimalSound(trigger.Animal, AnimalSoundCue.Sing);
                 }
             }
 
             foreach (KeyValuePair<int, AnimalAction> entry in report.Actions)
             {
-                AnimalColor color = sim.Animals[entry.Key].Color;
+                Animal animal = sim.Animals[entry.Key];
                 switch (entry.Value)
                 {
                     case AnimalAction.LeaveMap:
-                        sound.PlayAnimalSound(color, AnimalSoundCue.Plopp);
+                        board.PlayAnimalSound(animal, AnimalSoundCue.Plopp);
                         break;
                     case AnimalAction.ReachFlag:
-                        sound.PlayAnimalSound(color, AnimalSoundCue.Happy);
+                        board.PlayAnimalSound(animal, AnimalSoundCue.Happy);
                         break;
                     case AnimalAction.Eat:
-                        sound.PlayAnimalSound(color, AnimalSoundCue.Eat);
+                        board.PlayAnimalSound(animal, AnimalSoundCue.Eat);
                         break;
                 }
             }
@@ -422,7 +425,7 @@ namespace FGJ2026
                     foreach (Animal animal in sim.Animals)
                     {
                         if (!animal.OnFlag)
-                            sound.PlayAnimalSound(animal.Color, AnimalSoundCue.Sad);
+                            board.PlayAnimalSound(animal, AnimalSoundCue.Sad);
                     }
                     PrepareLossResult();
                     break;
