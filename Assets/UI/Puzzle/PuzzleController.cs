@@ -251,6 +251,7 @@ namespace FGJ2026
             if (!sim.StartDay())
                 return;
             StopPlanningAudio();
+            game.Sound.PlayMusic(MusicTrack.Simulation);
             tickTimer = secondsPerTick - startDelay;
             SetMessage($"Day {sim.DayNumber} is running...");
             RefreshAll();
@@ -331,6 +332,7 @@ namespace FGJ2026
         private void StartPlanningAudio()
         {
             StopPlanningAudio();
+            game.Sound.PlayMusic(MusicTrack.Planning);
             planningQuaks = StartCoroutine(PlayPlanningQuaks());
             foreach (Animal animal in sim.Animals)
             {
