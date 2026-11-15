@@ -37,6 +37,7 @@ namespace FGJ2026
         private const string BannerExiting = "phase-banner__track--exiting";
         private const string PlanningBanner = "Planning Phase";
         private const float BannerPositionTolerance = 0.5f;
+        private const float PlanningSongDelay = 0.5f;
 
         private GameManager game;
         private TestRun test;
@@ -47,6 +48,7 @@ namespace FGJ2026
         private float tickTimer;
         private Coroutine planningQuaks;
         private AudioSource planningQuakSource;
+        private readonly List<Coroutine> planningSongs = new List<Coroutine>();
 
         private WorldBoard board;
         private Camera boardCamera;
@@ -90,13 +92,13 @@ namespace FGJ2026
         private void OnEnable()
         {
             if (sim?.Phase == PuzzlePhase.Preparation)
-                StartPlanningQuaks();
+                StartPlanningAudio();
         }
 
         private void OnDisable()
         {
             CancelPhaseBanner();
-            StopPlanningQuaks();
+            StopPlanningAudio();
             board?.StopAnimalSounds();
         }
 
@@ -243,7 +245,7 @@ namespace FGJ2026
             HideResult();
             SetMessage(PreparationHint());
             RefreshAll();
-            StartPlanningQuaks();
+            StartPlanningAudio();
             ShowPhaseBanner(PlanningBanner);
         }
 
@@ -251,7 +253,7 @@ namespace FGJ2026
         {
             if (!sim.StartDay())
                 return;
-            StopPlanningQuaks();
+            StopPlanningAudio();
             tickTimer = secondsPerTick - startDelay;
             SetMessage($"Day {sim.DayNumber} is running...");
             RefreshAll();
@@ -279,7 +281,7 @@ namespace FGJ2026
             SetMessage($"Back to the start of day {sim.DayNumber}. {PreparationHint()}");
             RefreshAll();
             if (sim.Phase == PuzzlePhase.Preparation)
-                StartPlanningQuaks();
+                StartPlanningAudio();
             if (previousPhase != PuzzlePhase.Preparation && sim.Phase == PuzzlePhase.Preparation)
                 ShowPhaseBanner(PlanningBanner);
         }
@@ -288,7 +290,7 @@ namespace FGJ2026
         private void Leave()
         {
             CancelPhaseBanner();
-            StopPlanningQuaks();
+            StopPlanningAudio();
             if (test != null)
                 game.OpenLevelEditor();
             else
@@ -329,22 +331,32 @@ namespace FGJ2026
 
         // ------------------------------------------------------------ Simulation feedback
 
-        private void StartPlanningQuaks()
+        private void StartPlanningAudio()
         {
-            StopPlanningQuaks();
+            StopPlanningAudio();
             planningQuaks = StartCoroutine(PlayPlanningQuaks());
+            foreach (Animal animal in sim.Animals)
+            {
+                if (animal.OnlySings)
+                    planningSongs.Add(StartCoroutine(PlayPlanningSongs(animal)));
+            }
         }
 
-        private void StopPlanningQuaks()
+        private void StopPlanningAudio()
         {
-            if (planningQuaks == null)
-                return;
-
-            StopCoroutine(planningQuaks);
-            planningQuaks = null;
+            if (planningQuaks != null)
+            {
+                StopCoroutine(planningQuaks);
+                planningQuaks = null;
+            }
             if (planningQuakSource != null)
                 planningQuakSource.Stop();
             planningQuakSource = null;
+
+            foreach (Coroutine song in planningSongs)
+                StopCoroutine(song);
+            planningSongs.Clear();
+            board?.StopPlanningSongs();
         }
 
         private IEnumerator PlayPlanningQuaks()
@@ -363,6 +375,21 @@ namespace FGJ2026
                 planningQuakSource = null;
             }
             planningQuaks = null;
+        }
+
+        private IEnumerator PlayPlanningSongs(Animal animal)
+        {
+            while (sim.Phase == PuzzlePhase.Preparation)
+            {
+                AudioSource source = board.StartPlanningSong(animal);
+                if (source != null)
+                {
+                    yield return new WaitWhile(() => source != null && source.isPlaying);
+                    board.StopPlanningSong(animal);
+                }
+
+                yield return new WaitForSeconds(PlanningSongDelay);
+            }
         }
 
         private void ApplyTick(TickReport report)
@@ -434,7 +461,7 @@ namespace FGJ2026
                         ? "Nobody learned anything."
                         : string.Join(" ", day.Confirmed.Select(c => $"{RuleText.Colour(c.Animal.Color)} learned: {RuleText.Format(c.Rule)}."));
                     SetMessage($"Day {day.Day} is over ({Reason(day.Reason)}). {learned}\nPrepare day {sim.DayNumber}.");
-                    StartPlanningQuaks();
+                    StartPlanningAudio();
                     ShowPhaseBanner(PlanningBanner);
                     break;
             }
@@ -524,7 +551,7 @@ namespace FGJ2026
                 phaseBannerTrack.worldBound.xMax <= phaseBanner.worldBound.xMin + BannerPositionTolerance);
             phaseBannerTrack.AddToClassList(BannerCentered);
             yield return new WaitUntil(() => phaseBannerTrack.worldBound.xMin >= phaseBanner.worldBound.xMin - BannerPositionTolerance);
-            yield return new WaitForSecondsRealtime(0.65f);
+            yield return new WaitForSecondsRealtime(0.8f);
 
             phaseBannerTrack.RemoveFromClassList(BannerCentered);
             phaseBannerTrack.AddToClassList(BannerExiting);
@@ -607,7 +634,7 @@ namespace FGJ2026
             playAgainButton.EnableInClassList(Hidden, !won);
             rewindDayButton.EnableInClassList(Hidden, won);
             restartButton.EnableInClassList(Hidden, won);
-            ShowPhaseBanner("Level Finished", () => resultOverlay.RemoveFromClassList(Hidden));
+            ShowPhaseBanner(won ?"Level Finished" : "Game Over", () => resultOverlay.RemoveFromClassList(Hidden));
         }
 
         private void HideResult() => resultOverlay?.AddToClassList(Hidden);

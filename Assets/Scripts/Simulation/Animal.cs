@@ -25,6 +25,7 @@ namespace FGJ2026.Simulation
         public IReadOnlyList<Rule> Rules => rules;
         public bool CanMove => rules.Any(r => r.Kind == RuleKind.MoveForward);
         public bool Sings => rules.Any(r => r.Kind == RuleKind.Sing);
+        public bool OnlySings => rules.Count > 0 && rules.All(r => r.Kind == RuleKind.Sing);
 
         internal Animal(int index, AnimalColor color, Vector2Int startCell, Vector2Int startFacing, IEnumerable<Rule> startRules)
         {

@@ -41,6 +41,7 @@ namespace FGJ2026.Board
             public Vector3 Target;
             public string State;
             public bool Sings;
+            public bool PlanningSinging;
         }
 
         private readonly LevelDefinition level;
@@ -147,7 +148,7 @@ namespace FGJ2026.Board
                 view.Target = target;
 
                 if (sim.Phase == PuzzlePhase.Preparation)
-                    Play(view, Idle);
+                    Play(view, view.PlanningSinging ? Sing : Idle);
                 else if (animal.OnFlag)
                     Play(view, Love);
             }
@@ -167,7 +168,7 @@ namespace FGJ2026.Board
             foreach (Animal animal in lastSim.Animals)
             {
                 AnimalView view = animals[animal.Index];
-                if (view.State == Idle && view.Visuals.activeInHierarchy && Random.Range(0, ++count) == 0)
+                if (view.State == Idle && !animal.OnlySings && view.Visuals.activeInHierarchy && Random.Range(0, ++count) == 0)
                     selected = animal;
             }
             return selected;
@@ -177,6 +178,36 @@ namespace FGJ2026.Board
         {
             AudioSource source = animals[animal.Index].AudioSource;
             return sound != null && sound.TryPlayAnimalSound(source, animal.Color, cue) ? source : null;
+        }
+
+        public AudioSource StartPlanningSong(Animal animal)
+        {
+            AudioSource source = PlayAnimalSound(animal, AnimalSoundCue.Sing);
+            if (source == null)
+                return null;
+
+            AnimalView view = animals[animal.Index];
+            view.PlanningSinging = true;
+            Play(view, Sing);
+            return source;
+        }
+
+        public void StopPlanningSong(Animal animal) => StopPlanningSong(animals[animal.Index]);
+
+        public void StopPlanningSongs()
+        {
+            foreach (AnimalView view in animals.Values)
+                StopPlanningSong(view);
+        }
+
+        private static void StopPlanningSong(AnimalView view)
+        {
+            if (!view.PlanningSinging)
+                return;
+
+            view.PlanningSinging = false;
+            view.AudioSource.Stop();
+            Play(view, Idle);
         }
 
         public void StopAnimalSounds()
