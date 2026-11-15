@@ -1,40 +1,45 @@
 using System;
 using System.IO;
-using System.Threading.Tasks;
 using UnityEngine;
 
-public static class FileManager
+namespace FGJ2026
 {
-    public static bool WriteToFile(string a_FileName, string a_FileContents)
+    /// <summary>Reads and writes text files in Application.persistentDataPath.</summary>
+    public static class FileManager
     {
-        var fullPath = Path.Combine(Application.persistentDataPath, a_FileName);
-
-        try
+        public static bool WriteToFile(string fileName, string contents)
         {
-            File.WriteAllText(fullPath, a_FileContents);
-            return true;
+            string fullPath = Path.Combine(Application.persistentDataPath, fileName);
+            try
+            {
+                File.WriteAllText(fullPath, contents);
+                return true;
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError($"Failed to write {fullPath}: {exception}");
+                return false;
+            }
         }
-        catch (Exception e)
-        {
-            Debug.LogError($"Failed to write to {fullPath} with exception {e}");
-            return false;
-        }
-    }
 
-    public static bool LoadFromFile(string a_FileName, out string result)
-    {
-        var fullPath = Path.Combine(Application.persistentDataPath, a_FileName);
+        /// <summary>Returns false (without an error) when the file doesn't exist yet.</summary>
+        public static bool LoadFromFile(string fileName, out string result)
+        {
+            string fullPath = Path.Combine(Application.persistentDataPath, fileName);
+            result = string.Empty;
+            if (!File.Exists(fullPath))
+                return false;
 
-        try
-        {
-            result = File.ReadAllText(fullPath);
-            return true;
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"Failed to read from {fullPath} with exception {e}");
-            result = "";
-            return false;
+            try
+            {
+                result = File.ReadAllText(fullPath);
+                return true;
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError($"Failed to read {fullPath}: {exception}");
+                return false;
+            }
         }
     }
 }

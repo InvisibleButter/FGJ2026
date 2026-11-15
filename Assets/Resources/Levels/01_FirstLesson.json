@@ -1,0 +1,26 @@
+{
+    "id": "first-lesson",
+    "name": "First Lesson",
+    "width": 5,
+    "height": 4,
+    "days": 2,
+    "ticksPerDay": 24,
+    "animals": [
+        { "color": "red", "x": 0, "y": 0, "facing": "north", "behaviours": ["move"] },
+        { "color": "blue", "x": 4, "y": 2, "facing": "west", "behaviours": ["sing"] }
+    ],
+    "flags": [
+        { "color": "red", "x": 3, "y": 2 }
+    ],
+    "items": [
+        { "type": "goodSweet", "count": 1 }
+    ],
+    "stars": [
+        { "type": "solve" },
+        { "type": "maxTicks", "value": 11 },
+        { "type": "maxItems", "value": 1 }
+    ],
+    "solution": [
+        { "day": 1, "item": "goodSweet", "x": 0, "y": 2 }
+    ]
+}

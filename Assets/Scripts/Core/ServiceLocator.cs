@@ -1,57 +1,36 @@
 using System;
 using System.Collections.Generic;
 
-public class ServiceLocator
+namespace FGJ2026
 {
-    private static ServiceLocator locator = null;
-
-    public static ServiceLocator Instance
+    public sealed class ServiceLocator
     {
-        get
+        private static ServiceLocator instance;
+
+        public static ServiceLocator Instance => instance ??= new ServiceLocator();
+
+        private readonly Dictionary<Type, IService> registeredServices = new Dictionary<Type, IService>();
+
+        public event Action AllInitialized;
+
+        private ServiceLocator()
         {
-            if (locator == null)
-            {
-                locator = new ServiceLocator();
-            }
-            return locator;
-        }
-    }
-
-    public Action OnAllInitilized { get; set; }
-
-    private ServiceLocator()
-    {
-    }
-
-    private Dictionary<Type, IService> _registeredServices = new Dictionary<Type, IService>();
-
-    public void Register<T>(IService serviceInstance) where T : IService
-    {
-        _registeredServices[typeof(T)] = serviceInstance;
-    }
-
-    public T GetService<T>() where T : IService
-    {
-        T serviceInstance = (T)_registeredServices[typeof(T)];
-        return serviceInstance;
-    }
-
-    public void Add(IService instance)
-    {
-        _registeredServices[instance.GetType()] = instance;
-    }
-
-
-    public void InitializeAll() 
-    {
-        foreach(var service in _registeredServices)
-        {
-            if(!service.Value.IsInitialized)
-            {
-                service.Value.Initialize();
-            }
         }
 
-        OnAllInitilized?.Invoke();
+        public void Add(IService service) => registeredServices[service.GetType()] = service;
+
+        /// <summary>Returns the service, or null when it isn't registered.</summary>
+        public T GetService<T>() where T : class, IService =>
+            registeredServices.TryGetValue(typeof(T), out IService service) ? (T)service : null;
+
+        public void InitializeAll()
+        {
+            foreach (IService service in registeredServices.Values)
+            {
+                if (!service.IsInitialized)
+                    service.Initialize();
+            }
+            AllInitialized?.Invoke();
+        }
     }
 }

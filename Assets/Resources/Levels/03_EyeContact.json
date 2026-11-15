@@ -1,0 +1,28 @@
+{
+    "id": "eye-contact",
+    "name": "Eye Contact",
+    "width": 6,
+    "height": 3,
+    "days": 2,
+    "ticksPerDay": 24,
+    "animals": [
+        { "color": "green", "x": 0, "y": 2, "facing": "east", "behaviours": ["move"] },
+        { "color": "yellow", "x": 5, "y": 2, "facing": "west", "behaviours": [] }
+    ],
+    "flags": [
+        { "color": "green", "x": 2, "y": 0 }
+    ],
+    "items": [
+        { "type": "goodSweet", "count": 1 },
+        { "type": "badSweet", "count": 1 }
+    ],
+    "stars": [
+        { "type": "solve" },
+        { "type": "maxTicks", "value": 30 },
+        { "type": "maxItems", "value": 2 }
+    ],
+    "solution": [
+        { "day": 1, "item": "badSweet", "x": 1, "y": 2 },
+        { "day": 2, "item": "goodSweet", "x": 2, "y": 2 }
+    ]
+}

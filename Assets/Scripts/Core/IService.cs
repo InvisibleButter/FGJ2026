@@ -1,8 +1,11 @@
-public interface IService
+namespace FGJ2026
 {
-    public void Initialize();
+    public interface IService
+    {
+        void Initialize();
 
-    public void DeInitialize();
+        void DeInitialize();
 
-    public bool IsInitialized { get; set; }
+        bool IsInitialized { get; set; }
+    }
 }

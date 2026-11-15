@@ -1,33 +1,19 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace FGJ2026
 {
+    /// <summary>Main menu: Start opens the puzzle overview, Credits toggles the credits panel, Quit exits.</summary>
     public sealed class StarterMenu : MonoBehaviour
     {
-        private const string MainGameScene = "MainGame";
-
         [SerializeField] private GameObject menuPanel;
         [SerializeField] private GameObject creditsPanel;
         [SerializeField] private EventSystem eventSystem;
-        [SerializeField] private UnityEngine.UI.Button creditsButton;
-        [SerializeField] private UnityEngine.UI.Button backButton;
+        [SerializeField] private Button creditsButton;
+        [SerializeField] private Button backButton;
 
-        private AsyncOperation gameLoad;
-
-        public void StartGame()
-        {
-            StartGameAtLevel(0);
-        }
-
-        public void StartGameAtLevel(int levelIndex)
-        {
-            if (gameLoad != null)
-                return;
-            
-            GameManager.Instance.SelectStartingLevel();
-        }
+        public void StartGame() => GameManager.Instance.OpenLevelSelect();
 
         public void ShowCredits()
         {

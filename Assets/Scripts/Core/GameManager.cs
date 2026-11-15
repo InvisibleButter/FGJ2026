@@ -1,66 +1,71 @@
-using System;
-using FGJ2026;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
-public class GameManager : MonoBehaviour
+namespace FGJ2026
 {
-    private ServiceLocator _serviceLocator;
-    public static GameManager Instance => _instance;
-    
-    private static GameManager _instance;
-
-    private void Awake()
+    /// <summary>
+    /// Lives for the whole session. Owns the level list and the player's progress and switches scenes.
+    /// It is created on demand, so any scene (e.g. MainGame) can be started directly in the Editor.
+    /// </summary>
+    public sealed class GameManager : MonoBehaviour
     {
-        if (_instance != null && _instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        else
-        {
-            _instance = this;
-        }
-        
-        RegisterServices();
-    }
-    
-    private void Start()
-    {
-        DontDestroyOnLoad(gameObject);
-    }
-    
-    private void Update()
-    {
-        #if UNITY_EDITOR
-        if (Keyboard.current?.spaceKey.wasPressedThisFrame == true)
-        {
-            ServiceLocator.Instance.GetService<LevelService>().LoadNextLevel();
-        }
-        #endif
-    }
+        public const string MenuScene = "StarterMenu";
+        public const string LevelSelectScene = "LevelSelect";
+        public const string PuzzleScene = "MainGame";
 
-    private void RegisterServices()
-    {
-        _serviceLocator = ServiceLocator.Instance;
-        _serviceLocator.OnAllInitilized += OnAllInitialized;
+        private static GameManager instance;
+        private static bool quitting;
 
-        var services = GetComponentsInChildren<IService>();
-        foreach(var service in services)
+        public static GameManager Instance
         {
-            _serviceLocator.Add(service);
+            get
+            {
+                if (instance == null && !quitting)
+                    new GameObject(nameof(GameManager)).AddComponent<GameManager>();
+                return instance;
+            }
         }
-        
-        _serviceLocator.InitializeAll();
-    }
 
-    public void SelectStartingLevel()
-    { 
-        SceneManager.LoadSceneAsync("MainGame");
-    }
+        public LevelService Levels { get; private set; }
+        public ProgressService Progress { get; private set; }
 
-    protected virtual void AddAdditionalServices() { }
-    
-    protected virtual void OnAllInitialized() { }
+        /// <summary>Index into <see cref="LevelService.Levels"/> of the puzzle to play or show.</summary>
+        public int SelectedLevelIndex { get; set; }
+
+        private void Awake()
+        {
+            if (instance != null && instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+
+            Levels = new LevelService();
+            Progress = new ProgressService();
+            ServiceLocator.Instance.Add(Levels);
+            ServiceLocator.Instance.Add(Progress);
+            ServiceLocator.Instance.InitializeAll();
+        }
+
+        private void OnApplicationQuit() => quitting = true;
+
+        private void OnDestroy()
+        {
+            if (instance == this)
+                instance = null;
+        }
+
+        public void OpenMenu() => SceneManager.LoadScene(MenuScene);
+
+        public void OpenLevelSelect() => SceneManager.LoadScene(LevelSelectScene);
+
+        public void OpenLevel(int index)
+        {
+            SelectedLevelIndex = index;
+            SceneManager.LoadScene(PuzzleScene);
+        }
+    }
 }
