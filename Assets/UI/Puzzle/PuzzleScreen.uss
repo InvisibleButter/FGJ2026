@@ -289,6 +289,43 @@
     width: 180px;
 }
 
+.phase-banner {
+    position: absolute;
+    top: 120px;
+    left: 0;
+    right: 0;
+    overflow: hidden;
+}
+
+.phase-banner__track {
+    flex-direction: row;
+    justify-content: center;
+    translate: -100% 0;
+}
+
+.phase-banner__track--centered {
+    translate: 0% 0;
+    transition-duration: 0.4s;
+    transition-timing-function: ease-out;
+}
+
+.phase-banner__track--exiting {
+    translate: 100% 0;
+    transition-duration: 0.35s;
+    transition-timing-function: ease-in;
+}
+
+.phase-banner__label {
+    margin: 0;
+    padding: 14px 40px;
+    background-color: var(--color-accent);
+    border-radius: 6px;
+    color: var(--color-text-dark);
+    font-size: 38px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}
+
 /* Result window */
 
 .overlay {

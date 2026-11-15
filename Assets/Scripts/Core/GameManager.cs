@@ -39,6 +39,7 @@ namespace FGJ2026
 
         public LevelService Levels { get; private set; }
         public ProgressService Progress { get; private set; }
+        public SoundService Sound { get; private set; }
 
         /// <summary>Index into <see cref="LevelService.Levels"/> of the puzzle to play or show.</summary>
         public int SelectedLevelIndex { get; set; }
@@ -62,8 +63,13 @@ namespace FGJ2026
 
             Levels = new LevelService();
             Progress = new ProgressService();
+            if (!TryGetComponent(out SoundService sound))
+                sound = gameObject.AddComponent<SoundService>();
+            Sound = sound;
+
             ServiceLocator.Instance.Add(Levels);
             ServiceLocator.Instance.Add(Progress);
+            ServiceLocator.Instance.Add(Sound);
             ServiceLocator.Instance.InitializeAll();
         }
 

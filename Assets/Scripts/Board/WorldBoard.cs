@@ -52,6 +52,7 @@ namespace FGJ2026.Board
         private readonly SpriteRenderer cursor;
 
         private PuzzleSimulation lastSim;
+        private PuzzleSimulation previousSim;
         private bool lastShowHints;
 
         public GameObject Root { get; }
@@ -150,6 +151,24 @@ namespace FGJ2026.Board
             UpdateCursor();
         }
 
+        public void CapturePreviousSim(PuzzleSimulation sim) => previousSim = sim.CreateSnapshot();
+
+        public AnimalColor? PickIdleAnimalColor()
+        {
+            if (lastSim == null)
+                return null;
+
+            AnimalColor? selected = null;
+            int count = 0;
+            foreach (Animal animal in lastSim.Animals)
+            {
+                AnimalView view = animals[animal.Index];
+                if (view.State == Idle && view.Root.activeInHierarchy && Random.Range(0, ++count) == 0)
+                    selected = animal.Color;
+            }
+            return selected;
+        }
+
         /// <summary>Plays the animations for what the animals did in a tick.</summary>
         public void PlayTick(TickReport report, PuzzleSimulation sim)
         {
@@ -163,7 +182,11 @@ namespace FGJ2026.Board
                     case AnimalAction.LeaveMap: Play(view, Move); break;
                     case AnimalAction.Eat: Play(view, Eat); break;
                     case AnimalAction.ReachFlag: Play(view, Love); break;
-                    case AnimalAction.Wait: Play(view, Sad); break;
+                    case AnimalAction.Wait:
+                        Play(view, Sad);
+                        if (previousSim?.Animals[animal.Index].LastAction != AnimalAction.Wait)
+                            ServiceLocator.Instance.GetService<SoundService>().PlayAnimalSound(animal.Color, AnimalSoundCue.Sad);
+                        break;
                     default: Play(view, view.Sings && !animal.OnFlag ? Sing : animal.OnFlag ? Love : Idle); break;
                 }
             }

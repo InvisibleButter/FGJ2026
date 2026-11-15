@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a49e97db8e9f4cebbd7b8e4a7746792b, type: 3}
+  m_Name: Purple
+  m_EditorClassIdentifier: Assembly-CSharp::FGJ2026.AnimalSoundProfile
+  color: 4
+  sing:
+  - {fileID: 8300000, guid: ba895a6fce3b5954e8c503245edb7ad8, type: 3}
+  - {fileID: 8300000, guid: fda1320a952fa1348bd64b13504f74aa, type: 3}
+  plopp: {fileID: 8300000, guid: 375f323a374229442b1b5e8a1ea5b886, type: 3}
+  sad:
+  - {fileID: 8300000, guid: 460d56521a02766439938340417b73b4, type: 3}
+  - {fileID: 8300000, guid: d33044552b8cff7408e6d3a8ec86e8ec, type: 3}
+  happy: {fileID: 8300000, guid: 8320ec5f50902004494de49e49112d00, type: 3}
+  eat:
+  - {fileID: 8300000, guid: 53b80b5b7f341594c8c466bf835d6966, type: 3}
+  - {fileID: 8300000, guid: a491744b09bba0b44b6f881fd5ce20b7, type: 3}
+  quak: {fileID: 8300000, guid: 41e238132e7dd9f4aac2fae1cc796398, type: 3}
