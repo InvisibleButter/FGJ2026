@@ -37,9 +37,12 @@ namespace FGJ2026
         private const string BannerExiting = "phase-banner__track--exiting";
         private const string PlanningBanner = "Planning Phase";
         private const float BannerPositionTolerance = 0.5f;
+        private const float PlanningSongDelay = 0.5f;
+        private const string ResultStarPending = "result-star--pending";
+        private const long FirstStarDelayMs = 120;
+        private const long StarRevealIntervalMs = 280;
 
         private GameManager game;
-        private SoundService sound;
         private TestRun test;
         private LevelDefinition level;
         private int levelIndex;
@@ -47,6 +50,8 @@ namespace FGJ2026
         private ItemType? selectedItem;
         private float tickTimer;
         private Coroutine planningQuaks;
+        private AudioSource planningQuakSource;
+        private readonly List<Coroutine> planningSongs = new List<Coroutine>();
 
         private WorldBoard board;
         private Camera boardCamera;
@@ -67,7 +72,6 @@ namespace FGJ2026
         private void Start()
         {
             game = GameManager.Instance;
-            sound = game.Sound;
             test = game.CurrentTest;
             levelIndex = Mathf.Clamp(game.SelectedLevelIndex, 0, Mathf.Max(0, game.Levels.Count - 1));
             level = test != null ? test.Level : game.Levels.Get(levelIndex);
@@ -81,7 +85,7 @@ namespace FGJ2026
             BindUi();
             BuildLevelUi();
 
-            board = new WorldBoard(level, Vector3.zero, true);
+            board = new WorldBoard(level, Vector3.zero, true, game.Sound);
             boardCamera = Camera.main;
             boardCamera.enabled = false; // shown once it is framed (after the first UI layout)
 
@@ -91,14 +95,14 @@ namespace FGJ2026
         private void OnEnable()
         {
             if (sim?.Phase == PuzzlePhase.Preparation)
-                StartPlanningQuaks();
+                StartPlanningAudio();
         }
 
         private void OnDisable()
         {
             CancelPhaseBanner();
-            StopPlanningQuaks();
-            sound?.StopAnimalSounds();
+            StopPlanningAudio();
+            board?.StopAnimalSounds();
         }
 
         private void Update()
@@ -238,13 +242,13 @@ namespace FGJ2026
 
         private void Restart()
         {
-            sound.StopAnimalSounds();
+            board.StopAnimalSounds();
             sim = new PuzzleSimulation(level);
             selectedItem = level.ItemTypes.Count > 0 ? level.ItemTypes[0] : (ItemType?)null;
             HideResult();
             SetMessage(PreparationHint());
             RefreshAll();
-            StartPlanningQuaks();
+            StartPlanningAudio();
             ShowPhaseBanner(PlanningBanner);
         }
 
@@ -252,7 +256,7 @@ namespace FGJ2026
         {
             if (!sim.StartDay())
                 return;
-            StopPlanningQuaks();
+            StopPlanningAudio();
             tickTimer = secondsPerTick - startDelay;
             SetMessage($"Day {sim.DayNumber} is running...");
             RefreshAll();
@@ -263,7 +267,7 @@ namespace FGJ2026
         {
             if (sim.Phase != PuzzlePhase.Running)
                 return;
-            sound.StopAnimalSounds();
+            board.StopAnimalSounds();
             TickReport last = sim.RunToEndOfDay();
             RefreshAll();
             if (last?.DayEnded != null)
@@ -272,7 +276,7 @@ namespace FGJ2026
 
         private void Rewind()
         {
-            sound.StopAnimalSounds();
+            board.StopAnimalSounds();
             PuzzlePhase previousPhase = sim.Phase;
             sim.Rewind();
             tickTimer = 0f;
@@ -280,7 +284,7 @@ namespace FGJ2026
             SetMessage($"Back to the start of day {sim.DayNumber}. {PreparationHint()}");
             RefreshAll();
             if (sim.Phase == PuzzlePhase.Preparation)
-                StartPlanningQuaks();
+                StartPlanningAudio();
             if (previousPhase != PuzzlePhase.Preparation && sim.Phase == PuzzlePhase.Preparation)
                 ShowPhaseBanner(PlanningBanner);
         }
@@ -289,7 +293,7 @@ namespace FGJ2026
         private void Leave()
         {
             CancelPhaseBanner();
-            StopPlanningQuaks();
+            StopPlanningAudio();
             if (test != null)
                 game.OpenLevelEditor();
             else
@@ -330,20 +334,32 @@ namespace FGJ2026
 
         // ------------------------------------------------------------ Simulation feedback
 
-        private void StartPlanningQuaks()
+        private void StartPlanningAudio()
         {
-            StopPlanningQuaks();
+            StopPlanningAudio();
             planningQuaks = StartCoroutine(PlayPlanningQuaks());
+            foreach (Animal animal in sim.Animals)
+            {
+                if (animal.OnlySings)
+                    planningSongs.Add(StartCoroutine(PlayPlanningSongs(animal)));
+            }
         }
 
-        private void StopPlanningQuaks()
+        private void StopPlanningAudio()
         {
-            if (planningQuaks == null)
-                return;
+            if (planningQuaks != null)
+            {
+                StopCoroutine(planningQuaks);
+                planningQuaks = null;
+            }
+            if (planningQuakSource != null)
+                planningQuakSource.Stop();
+            planningQuakSource = null;
 
-            StopCoroutine(planningQuaks);
-            planningQuaks = null;
-            sound.StopIdleSound();
+            foreach (Coroutine song in planningSongs)
+                StopCoroutine(song);
+            planningSongs.Clear();
+            board?.StopPlanningSongs();
         }
 
         private IEnumerator PlayPlanningQuaks()
@@ -352,14 +368,31 @@ namespace FGJ2026
             {
                 yield return new WaitForSeconds(UnityEngine.Random.Range(1.5f, 4f));
 
-                AnimalColor? color = board.PickIdleAnimalColor();
-                if (!color.HasValue)
+                Animal animal = board.PickIdleAnimal();
+                if (animal == null)
                     continue;
 
-                sound.PlayIdleSound(color.Value);
-                yield return new WaitWhile(() => sound.IsIdleSoundPlaying);
+                planningQuakSource = board.PlayAnimalSound(animal, AnimalSoundCue.Quak);
+                if (planningQuakSource != null)
+                    yield return new WaitWhile(() => planningQuakSource != null && planningQuakSource.isPlaying);
+                planningQuakSource = null;
             }
             planningQuaks = null;
+        }
+
+        private IEnumerator PlayPlanningSongs(Animal animal)
+        {
+            while (sim.Phase == PuzzlePhase.Preparation)
+            {
+                AudioSource source = board.StartPlanningSong(animal);
+                if (source != null)
+                {
+                    yield return new WaitWhile(() => source != null && source.isPlaying);
+                    board.StopPlanningSong(animal);
+                }
+
+                yield return new WaitForSeconds(PlanningSongDelay);
+            }
         }
 
         private void ApplyTick(TickReport report)
@@ -385,23 +418,23 @@ namespace FGJ2026
             {
                 if (trigger.Rule.Kind == RuleKind.Sing)
                 {
-                    sound.PlayAnimalSound(trigger.Animal.Color, AnimalSoundCue.Sing);
+                    board.PlayAnimalSound(trigger.Animal, AnimalSoundCue.Sing);
                 }
             }
 
             foreach (KeyValuePair<int, AnimalAction> entry in report.Actions)
             {
-                AnimalColor color = sim.Animals[entry.Key].Color;
+                Animal animal = sim.Animals[entry.Key];
                 switch (entry.Value)
                 {
                     case AnimalAction.LeaveMap:
-                        sound.PlayAnimalSound(color, AnimalSoundCue.Plopp);
+                        board.PlayAnimalSound(animal, AnimalSoundCue.Plopp);
                         break;
                     case AnimalAction.ReachFlag:
-                        sound.PlayAnimalSound(color, AnimalSoundCue.Happy);
+                        board.PlayAnimalSound(animal, AnimalSoundCue.Happy);
                         break;
                     case AnimalAction.Eat:
-                        sound.PlayAnimalSound(color, AnimalSoundCue.Eat);
+                        board.PlayAnimalSound(animal, AnimalSoundCue.Eat);
                         break;
                 }
             }
@@ -422,7 +455,7 @@ namespace FGJ2026
                     foreach (Animal animal in sim.Animals)
                     {
                         if (!animal.OnFlag)
-                            sound.PlayAnimalSound(animal.Color, AnimalSoundCue.Sad);
+                            board.PlayAnimalSound(animal, AnimalSoundCue.Sad);
                     }
                     PrepareLossResult();
                     break;
@@ -431,7 +464,7 @@ namespace FGJ2026
                         ? "Nobody learned anything."
                         : string.Join(" ", day.Confirmed.Select(c => $"{RuleText.Colour(c.Animal.Color)} learned: {RuleText.Format(c.Rule)}."));
                     SetMessage($"Day {day.Day} is over ({Reason(day.Reason)}). {learned}\nPrepare day {sim.DayNumber}.");
-                    StartPlanningQuaks();
+                    StartPlanningAudio();
                     ShowPhaseBanner(PlanningBanner);
                     break;
             }
@@ -524,7 +557,7 @@ namespace FGJ2026
                 phaseBannerTrack.worldBound.xMax <= phaseBanner.worldBound.xMin + BannerPositionTolerance);
             phaseBannerTrack.AddToClassList(BannerCentered);
             yield return new WaitUntil(() => phaseBannerTrack.worldBound.xMin >= phaseBanner.worldBound.xMin - BannerPositionTolerance);
-            yield return new WaitForSecondsRealtime(0.65f);
+            yield return new WaitForSecondsRealtime(0.8f);
 
             phaseBannerTrack.RemoveFromClassList(BannerCentered);
             phaseBannerTrack.AddToClassList(BannerExiting);
@@ -607,9 +640,26 @@ namespace FGJ2026
             playAgainButton.EnableInClassList(Hidden, !won);
             rewindDayButton.EnableInClassList(Hidden, won);
             restartButton.EnableInClassList(Hidden, won);
-            ShowPhaseBanner("Level Finished", () => resultOverlay.RemoveFromClassList(Hidden));
+            ShowPhaseBanner(won ? "Level Finished" : "Game Over", ShowResult);
         }
 
-        private void HideResult() => resultOverlay?.AddToClassList(Hidden);
+        private void ShowResult()
+        {
+            long delay = FirstStarDelayMs;
+            foreach (VisualElement row in resultStars.Children())
+            {
+                row.AddToClassList(ResultStarPending);
+                row.schedule.Execute(() => row.RemoveFromClassList(ResultStarPending)).StartingIn(delay);
+                delay += StarRevealIntervalMs;
+            }
+
+            resultOverlay.RemoveFromClassList(Hidden);
+        }
+
+        private void HideResult()
+        {
+            resultOverlay?.AddToClassList(Hidden);
+            resultStars?.Clear();
+        }
     }
 }
