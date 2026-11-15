@@ -14,15 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FGJ2026.AnimalSoundProfile
   color: 5
   sing:
-  - {fileID: 8300000, guid: f1fdb5f93d66dc94196ac5c396f79bb2, type: 3}
-  - {fileID: 8300000, guid: 2be5b73bbed10e347957502e014f41da, type: 3}
-  plopp: {fileID: 8300000, guid: 0ab42b784bfaac941adef92167f4aebe, type: 3}
+  - {fileID: 8300000, guid: 4cdbbec30318dfa4da9299f4672d7a56, type: 3}
+  - {fileID: 8300000, guid: 0e01aa592e3fce54c86668c3f6a58498, type: 3}
+  plopp: {fileID: 8300000, guid: 1fc6457d38a31c846811e9cc4234ba16, type: 3}
   sad:
-  - {fileID: 8300000, guid: 8f21a69f0d54f9640b46e7058c721fbc, type: 3}
-  - {fileID: 8300000, guid: 6b0d9b022a63dcb47be5e85a9bea29b9, type: 3}
-  happy: {fileID: 8300000, guid: 8b5787258eac3f04ba018ec791ceaa23, type: 3}
+  - {fileID: 8300000, guid: 17821d296840a43488d7d24f64732113, type: 3}
+  - {fileID: 8300000, guid: 16f2829b843a78549b3b125361041936, type: 3}
+  happy: {fileID: 8300000, guid: b8aa300783ef26544b520445f9ff96bd, type: 3}
   eat:
-  - {fileID: 8300000, guid: 7e10104ab8a64a848b63205f38b18abb, type: 3}
-  - {fileID: 8300000, guid: b1c5daea72306cb43a37a292544afde1, type: 3}
-  quak: {fileID: 8300000, guid: 41a0c76585477db459fe3d17e955e183, type: 3}
-  move: {fileID: 8300000, guid: 457a29b7fd859ca4a806242b47712696, type: 3}
+  - {fileID: 8300000, guid: ef273d6dda7898544a74a82f8f1af0ee, type: 3}
+  - {fileID: 8300000, guid: 4138fbc2b9f463c4e9730bad690f20c6, type: 3}
+  quak: {fileID: 8300000, guid: 64f16b244497cdc49b5c0c5103ae8eec, type: 3}
+  move: {fileID: 8300000, guid: 3f88aab85e3791e4ca4f561dd18e2c4b, type: 3}

@@ -524,7 +524,6 @@ namespace FGJ2026.Board
                 Animator = animator,
                 AudioSource = sound != null ? CreateAnimalAudioSource(root) : null,
                 Emote = emote,
-                AudioSource = audioSource,
                 Variant = variant,
                 Facing = setup.Facing,
                 Arrow = arrow.transform,
