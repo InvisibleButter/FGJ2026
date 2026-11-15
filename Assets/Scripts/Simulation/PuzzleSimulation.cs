@@ -127,6 +127,8 @@ namespace FGJ2026.Simulation
             CopyFrom(source);
         }
 
+        public PuzzleSimulation CreateSnapshot() => new PuzzleSimulation(this);
+
         private void CopyFrom(PuzzleSimulation source)
         {
             animals.Clear();
@@ -228,6 +230,8 @@ namespace FGJ2026.Simulation
             {
                 if (animal.IsActive)
                     Act(animal, songs, report);
+                report.Actions.TryGetValue(animal.Index, out AnimalAction action);
+                animal.LastAction = action;
             }
 
             if (Level.Flags.All(IsFlagReached))

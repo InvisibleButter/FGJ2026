@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FGJ2026.Board;
@@ -31,14 +33,20 @@ namespace FGJ2026
         [SerializeField, Min(0f)] private float startDelay = 0.35f;
 
         private const string Hidden = "hidden";
+        private const string BannerCentered = "phase-banner__track--centered";
+        private const string BannerExiting = "phase-banner__track--exiting";
+        private const string PlanningBanner = "Planning Phase";
+        private const float BannerPositionTolerance = 0.5f;
 
         private GameManager game;
+        private SoundService sound;
         private TestRun test;
         private LevelDefinition level;
         private int levelIndex;
         private PuzzleSimulation sim;
         private ItemType? selectedItem;
         private float tickTimer;
+        private Coroutine planningQuaks;
 
         private WorldBoard board;
         private Camera boardCamera;
@@ -48,6 +56,9 @@ namespace FGJ2026
         private readonly Dictionary<ItemType, (Button button, Label label)> itemButtons = new Dictionary<ItemType, (Button, Label)>();
 
         private VisualElement root, boardArea, resultOverlay, resultStars;
+        private VisualElement phaseBanner, phaseBannerTrack;
+        private Label phaseBannerLabel;
+        private Coroutine phaseBannerAnimation;
         private Label calendarLabel, clockTick, clockCaption, phaseLabel, messageLabel, resultTitle, resultSubtitle;
         private ProgressBar clockBar;
         private Button startButton, skipButton, rewindButton;
@@ -56,6 +67,7 @@ namespace FGJ2026
         private void Start()
         {
             game = GameManager.Instance;
+            sound = game.Sound;
             test = game.CurrentTest;
             levelIndex = Mathf.Clamp(game.SelectedLevelIndex, 0, Mathf.Max(0, game.Levels.Count - 1));
             level = test != null ? test.Level : game.Levels.Get(levelIndex);
@@ -76,6 +88,19 @@ namespace FGJ2026
             Restart();
         }
 
+        private void OnEnable()
+        {
+            if (sim?.Phase == PuzzlePhase.Preparation)
+                StartPlanningQuaks();
+        }
+
+        private void OnDisable()
+        {
+            CancelPhaseBanner();
+            StopPlanningQuaks();
+            sound?.StopAnimalSounds();
+        }
+
         private void Update()
         {
             if (sim == null)
@@ -92,6 +117,7 @@ namespace FGJ2026
                 return;
 
             tickTimer -= secondsPerTick;
+            board.CapturePreviousSim(sim);
             ApplyTick(sim.Step());
         }
 
@@ -122,6 +148,9 @@ namespace FGJ2026
             clockBar = root.Q<ProgressBar>("clockBar");
             phaseLabel = root.Q<Label>("phaseLabel");
             messageLabel = root.Q<Label>("messageLabel");
+            phaseBanner = root.Q("phaseBanner");
+            phaseBannerTrack = root.Q("phaseBannerTrack");
+            phaseBannerLabel = root.Q<Label>("phaseBannerLabel");
 
             startButton = root.Q<Button>("startButton");
             skipButton = root.Q<Button>("skipButton");
@@ -209,26 +238,32 @@ namespace FGJ2026
 
         private void Restart()
         {
+            sound.StopAnimalSounds();
             sim = new PuzzleSimulation(level);
             selectedItem = level.ItemTypes.Count > 0 ? level.ItemTypes[0] : (ItemType?)null;
             HideResult();
             SetMessage(PreparationHint());
             RefreshAll();
+            StartPlanningQuaks();
+            ShowPhaseBanner(PlanningBanner);
         }
 
         private void StartDay()
         {
             if (!sim.StartDay())
                 return;
+            StopPlanningQuaks();
             tickTimer = secondsPerTick - startDelay;
             SetMessage($"Day {sim.DayNumber} is running...");
             RefreshAll();
+            ShowPhaseBanner("Simulation Phase");
         }
 
         private void SkipDay()
         {
             if (sim.Phase != PuzzlePhase.Running)
                 return;
+            sound.StopAnimalSounds();
             TickReport last = sim.RunToEndOfDay();
             RefreshAll();
             if (last?.DayEnded != null)
@@ -237,16 +272,24 @@ namespace FGJ2026
 
         private void Rewind()
         {
+            sound.StopAnimalSounds();
+            PuzzlePhase previousPhase = sim.Phase;
             sim.Rewind();
             tickTimer = 0f;
             HideResult();
             SetMessage($"Back to the start of day {sim.DayNumber}. {PreparationHint()}");
             RefreshAll();
+            if (sim.Phase == PuzzlePhase.Preparation)
+                StartPlanningQuaks();
+            if (previousPhase != PuzzlePhase.Preparation && sim.Phase == PuzzlePhase.Preparation)
+                ShowPhaseBanner(PlanningBanner);
         }
 
         /// <summary>Exit: back to the level editor after a test run, otherwise to the main menu.</summary>
         private void Leave()
         {
+            CancelPhaseBanner();
+            StopPlanningQuaks();
             if (test != null)
                 game.OpenLevelEditor();
             else
@@ -287,6 +330,38 @@ namespace FGJ2026
 
         // ------------------------------------------------------------ Simulation feedback
 
+        private void StartPlanningQuaks()
+        {
+            StopPlanningQuaks();
+            planningQuaks = StartCoroutine(PlayPlanningQuaks());
+        }
+
+        private void StopPlanningQuaks()
+        {
+            if (planningQuaks == null)
+                return;
+
+            StopCoroutine(planningQuaks);
+            planningQuaks = null;
+            sound.StopIdleSound();
+        }
+
+        private IEnumerator PlayPlanningQuaks()
+        {
+            while (sim.Phase == PuzzlePhase.Preparation)
+            {
+                yield return new WaitForSeconds(UnityEngine.Random.Range(1.5f, 4f));
+
+                AnimalColor? color = board.PickIdleAnimalColor();
+                if (!color.HasValue)
+                    continue;
+
+                sound.PlayIdleSound(color.Value);
+                yield return new WaitWhile(() => sound.IsIdleSoundPlaying);
+            }
+            planningQuaks = null;
+        }
+
         private void ApplyTick(TickReport report)
         {
             if (report == null)
@@ -294,6 +369,7 @@ namespace FGJ2026
 
             RefreshAll(); // first, so blocks for newly learned rules exist
             board.PlayTick(report, sim);
+            PlayTickSounds(report);
             foreach (RuleTrigger trigger in report.Triggered.Concat(report.Learned))
                 Panel(trigger.Animal)?.Trigger(trigger.Rule.Id);
             if (report.Events.Count > 0)
@@ -301,6 +377,34 @@ namespace FGJ2026
 
             if (report.DayEnded != null)
                 OnDayEnded(report.DayEnded);
+        }
+
+        private void PlayTickSounds(TickReport report)
+        {
+            foreach (RuleTrigger trigger in report.Triggered)
+            {
+                if (trigger.Rule.Kind == RuleKind.Sing)
+                {
+                    sound.PlayAnimalSound(trigger.Animal.Color, AnimalSoundCue.Sing);
+                }
+            }
+
+            foreach (KeyValuePair<int, AnimalAction> entry in report.Actions)
+            {
+                AnimalColor color = sim.Animals[entry.Key].Color;
+                switch (entry.Value)
+                {
+                    case AnimalAction.LeaveMap:
+                        sound.PlayAnimalSound(color, AnimalSoundCue.Plopp);
+                        break;
+                    case AnimalAction.ReachFlag:
+                        sound.PlayAnimalSound(color, AnimalSoundCue.Happy);
+                        break;
+                    case AnimalAction.Eat:
+                        sound.PlayAnimalSound(color, AnimalSoundCue.Eat);
+                        break;
+                }
+            }
         }
 
         private void OnDayEnded(DayReport day)
@@ -312,16 +416,23 @@ namespace FGJ2026
             switch (sim.Phase)
             {
                 case PuzzlePhase.Won:
-                    ShowWin();
+                    PrepareWinResult();
                     break;
                 case PuzzlePhase.Lost:
-                    ShowLoss();
+                    foreach (Animal animal in sim.Animals)
+                    {
+                        if (!animal.OnFlag)
+                            sound.PlayAnimalSound(animal.Color, AnimalSoundCue.Sad);
+                    }
+                    PrepareLossResult();
                     break;
                 default:
                     string learned = day.Confirmed.Count == 0
                         ? "Nobody learned anything."
                         : string.Join(" ", day.Confirmed.Select(c => $"{RuleText.Colour(c.Animal.Color)} learned: {RuleText.Format(c.Rule)}."));
                     SetMessage($"Day {day.Day} is over ({Reason(day.Reason)}). {learned}\nPrepare day {sim.DayNumber}.");
+                    StartPlanningQuaks();
+                    ShowPhaseBanner(PlanningBanner);
                     break;
             }
         }
@@ -397,14 +508,50 @@ namespace FGJ2026
 
         private void SetMessage(string text) => messageLabel.text = text;
 
+        private void ShowPhaseBanner(string text, Action onFinished = null)
+        {
+            CancelPhaseBanner();
+            phaseBannerLabel.text = text;
+            phaseBannerAnimation = StartCoroutine(AnimatePhaseBanner(onFinished));
+        }
+
+        private IEnumerator AnimatePhaseBanner(Action onFinished)
+        {
+            yield return new WaitUntil(() => phaseBanner.worldBound.width > 1f &&
+                phaseBannerTrack.worldBound.xMax <= phaseBanner.worldBound.xMin + BannerPositionTolerance);
+            phaseBannerTrack.AddToClassList(BannerCentered);
+            yield return new WaitUntil(() => phaseBannerTrack.worldBound.xMin >= phaseBanner.worldBound.xMin - BannerPositionTolerance);
+            yield return new WaitForSecondsRealtime(0.65f);
+
+            phaseBannerTrack.RemoveFromClassList(BannerCentered);
+            phaseBannerTrack.AddToClassList(BannerExiting);
+            yield return new WaitUntil(() => phaseBannerTrack.worldBound.xMin >= phaseBanner.worldBound.xMax - BannerPositionTolerance);
+
+            phaseBannerAnimation = null;
+            CancelPhaseBanner();
+            onFinished?.Invoke();
+        }
+
+        private void CancelPhaseBanner()
+        {
+            if (phaseBannerAnimation != null)
+            {
+                StopCoroutine(phaseBannerAnimation);
+                phaseBannerAnimation = null;
+            }
+
+            phaseBannerTrack?.RemoveFromClassList(BannerCentered);
+            phaseBannerTrack?.RemoveFromClassList(BannerExiting);
+        }
+
         // ------------------------------------------------------------ Result window
 
-        private void ShowWin()
+        private void PrepareWinResult()
         {
             bool[] earned = sim.EvaluateStars();
             if (test != null)
             {
-                ShowTestWin(earned);
+                PrepareTestWinResult(earned);
                 return;
             }
             bool[] isNew = game.Progress.Record(level.Id, earned);
@@ -419,11 +566,11 @@ namespace FGJ2026
                 StarRowView.Add(resultStars, starRowTemplate, level.Stars[i].Description, earned[i] || before, note);
             }
 
-            ShowResult(won: true);
+            PrepareResult(won: true);
         }
 
         /// <summary>A won test run: nothing is saved as progress; the run goes back to the editor as the level's solution.</summary>
-        private void ShowTestWin(bool[] earned)
+        private void PrepareTestWinResult(bool[] earned)
         {
             EditorSession session = game.EditorState;
             session.LastResult = new TestResult
@@ -440,24 +587,24 @@ namespace FGJ2026
             resultStars.Clear();
             for (int i = 0; i < level.Stars.Count; i++)
                 StarRowView.Add(resultStars, starRowTemplate, level.Stars[i].Description, earned[i], earned[i] ? "met" : "missed");
-            ShowResult(won: true);
+            PrepareResult(won: true);
         }
 
-        private void ShowLoss()
+        private void PrepareLossResult()
         {
             resultTitle.text = "Out of days";
             resultSubtitle.text = "The animals didn't reach their flags in time.";
             resultStars.Clear();
-            ShowResult(won: false);
+            PrepareResult(won: false);
         }
 
-        private void ShowResult(bool won)
+        private void PrepareResult(bool won)
         {
             nextPuzzleButton.EnableInClassList(Hidden, !won || test != null || game.Levels.Get(levelIndex + 1) == null);
             playAgainButton.EnableInClassList(Hidden, !won);
             rewindDayButton.EnableInClassList(Hidden, won);
             restartButton.EnableInClassList(Hidden, won);
-            resultOverlay.RemoveFromClassList(Hidden);
+            ShowPhaseBanner("Level Finished", () => resultOverlay.RemoveFromClassList(Hidden));
         }
 
         private void HideResult() => resultOverlay?.AddToClassList(Hidden);

@@ -18,6 +18,7 @@ namespace FGJ2026.Simulation
         public Vector2Int Facing { get; internal set; }
         public bool OffMap { get; internal set; }
         public bool OnFlag { get; internal set; }
+        public AnimalAction LastAction { get; internal set; }
 
         /// <summary>Still taking part in the current day (on the map and not yet at its flag).</summary>
         public bool IsActive => !OffMap && !OnFlag;
@@ -46,6 +47,7 @@ namespace FGJ2026.Simulation
             Facing = source.Facing;
             OffMap = source.OffMap;
             OnFlag = source.OnFlag;
+            LastAction = source.LastAction;
         }
 
         internal Animal Clone() => new Animal(this);
@@ -56,6 +58,7 @@ namespace FGJ2026.Simulation
             Facing = StartFacing;
             OffMap = false;
             OnFlag = false;
+            LastAction = AnimalAction.None;
         }
 
         internal Rule FindRule(RuleKind kind) => rules.FirstOrDefault(r => r.Kind == kind);

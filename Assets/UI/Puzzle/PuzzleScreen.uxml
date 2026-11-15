@@ -56,5 +56,10 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
+        <ui:VisualElement name="phaseBanner" class="phase-banner" picking-mode="Ignore">
+            <ui:VisualElement name="phaseBannerTrack" class="phase-banner__track" picking-mode="Ignore">
+                <ui:Label name="phaseBannerLabel" class="phase-banner__label" picking-mode="Ignore" />
+            </ui:VisualElement>
+        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
