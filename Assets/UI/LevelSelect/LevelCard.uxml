@@ -1,7 +1,9 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
     <ui:Button name="levelCard" class="level-card">
-        <ui:Label name="cardNumber" text="1" class="level-card__number" />
-        <ui:Label name="cardName" text="Name" class="level-card__name" />
-        <ui:VisualElement name="cardStars" class="level-card__stars" />
+        <ui:VisualElement class="level-card__pad" picking-mode="Ignore">
+            <ui:Label name="cardNumber" text="1" class="level-card__number" picking-mode="Ignore" />
+            <ui:VisualElement name="cardStars" class="level-card__stars" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:Label name="cardName" text="Name" class="level-card__name" picking-mode="Ignore" />
     </ui:Button>
 </ui:UXML>

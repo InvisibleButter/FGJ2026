@@ -14,10 +14,13 @@
             </ui:VisualElement>
             <ui:Button name="backButton" text="Back" class="back-button" />
         </ui:VisualElement>
-        <ui:VisualElement name="details" class="panel details">
+        <ui:VisualElement name="details" class="sign details">
             <ui:Label name="detailNumber" text="Puzzle 1" class="details__number" />
             <ui:Label name="detailName" text="Name" class="details__name" />
-            <ui:Image name="preview" class="preview" />
+            <ui:VisualElement class="preview-frame">
+                <ui:Image name="preview" class="preview" />
+                <ui:VisualElement class="preview__border" picking-mode="Ignore" />
+            </ui:VisualElement>
             <ui:Label name="detailInfo" class="details__info" />
             <ui:VisualElement name="detailStars" class="details__stars" />
             <ui:Button name="playButton" text="Play" class="play-button button--go" />

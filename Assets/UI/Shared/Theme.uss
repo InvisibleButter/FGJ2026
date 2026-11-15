@@ -1,22 +1,22 @@
 :root {
-    --color-bg: #1C2129;
-    --color-panel: #2B313B;
-    --color-panel-hover: #343B47;
-    --color-panel-light: #3D4552;
-    --color-text: #F2F2F2;
-    --color-text-dim: #A8AFBD;
-    --color-text-dark: #1F2126;
-    --color-accent: #FFC747;
-    --color-good: #6BDE75;
-    --color-bad: #FA6B6B;
-    --color-button: #4273C2;
-    --color-button-hover: #5687D6;
-    --color-button-secondary: #545C6B;
-    --color-button-secondary-hover: #697283;
-    --color-button-go: #459E61;
-    --color-button-go-hover: #55B573;
-    --color-star-on: #FFD138;
-    --color-star-off: #575C6B;
+    --color-bg: #486878;
+    --color-panel: #582838;
+    --color-panel-hover: #683848;
+    --color-panel-light: #884848;
+    --color-text: #F3E6C8;
+    --color-text-dim: #D8C0A0;
+    --color-text-dark: #381828;
+    --color-accent: #D8B868;
+    --color-good: #A8B858;
+    --color-bad: #E88858;
+    --color-button: #689858;
+    --color-button-hover: #78A868;
+    --color-button-secondary: #884848;
+    --color-button-secondary-hover: #986868;
+    --color-button-go: #689858;
+    --color-button-go-hover: #78A868;
+    --color-star-on: #D8B868;
+    --color-star-off: #381828;
     -unity-font: url("project://database/Assets/TextMesh%20Pro/Fonts/LiberationSans.ttf");
     color: var(--color-text);
     font-size: 22px;
@@ -35,25 +35,42 @@
     display: none;
 }
 
+/* Art from Assets/Art/ui.png. Sliced sprites use their own borders; -unity-slice-scale 6px = one art pixel is 6 screen pixels at 1080p. */
+
 .panel {
-    background-color: var(--color-panel);
-    border-radius: 8px;
-    padding: 14px;
+    background-image: url("project://database/Assets/Art/ui.png?fileID=-9005941153719796207&guid=e8afd4c812d601c478793753c404b6ba&type=3#Puzzle");
+    -unity-slice-scale: 6px;
+    padding: 18px 20px;
+}
+
+/* The wooden sign (start menu frame): big windows. The bottom slice holds the little legs. */
+.sign {
+    background-image: url("project://database/Assets/Art/ui.png?fileID=5707218116961789024&guid=e8afd4c812d601c478793753c404b6ba&type=3#Start_UI_Frame");
+    -unity-slice-scale: 6px;
+    padding: 42px 48px 78px 48px;
+}
+
+.banner {
+    background-image: url("project://database/Assets/Art/ui.png?fileID=2163036573998151787&guid=e8afd4c812d601c478793753c404b6ba&type=3#Start_UI_Titlebanner");
+    -unity-slice-scale: 6px;
+    color: var(--color-text-dark);
 }
 
 .text-dim {
     color: var(--color-text-dim);
 }
 
-/* Buttons */
+/* Buttons: wooden option bar, darker bar when hovered */
 
 .unity-button {
-    background-color: var(--color-button-secondary);
+    background-image: url("project://database/Assets/Art/ui.png?fileID=3556181715638617739&guid=e8afd4c812d601c478793753c404b6ba&type=3#Start_UI_Option");
+    -unity-slice-scale: 6px;
+    background-color: rgba(0, 0, 0, 0);
     color: var(--color-text);
     border-width: 0;
-    border-radius: 6px;
+    border-radius: 0;
     margin: 0;
-    padding: 8px 20px;
+    padding: 8px 24px 10px 24px;
     font-size: 28px;
     -unity-font-style: bold;
     -unity-text-align: middle-center;
@@ -61,7 +78,7 @@
 }
 
 .unity-button:hover {
-    background-color: var(--color-button-secondary-hover);
+    background-image: url("project://database/Assets/Art/ui.png?fileID=-8816031292267695619&guid=e8afd4c812d601c478793753c404b6ba&type=3#Start_UI_Option_clicked");
 }
 
 .unity-button:active {
@@ -72,33 +89,35 @@
     opacity: 0.4;
 }
 
-.button--primary {
-    background-color: var(--color-button);
+.button--primary,
+.button--primary:hover {
+    background-image: url("project://database/Assets/Art/ui.png?fileID=-9005941153719796207&guid=e8afd4c812d601c478793753c404b6ba&type=3#Puzzle");
 }
 
 .button--primary:hover {
-    background-color: var(--color-button-hover);
+    -unity-background-image-tint-color: #C8D8D0;
 }
 
-.button--go {
-    background-color: var(--color-button-go);
+.button--go,
+.button--go:hover {
+    background-image: url("project://database/Assets/Art/ui.png?fileID=-9080700020481880845&guid=e8afd4c812d601c478793753c404b6ba&type=3#Puzzle_highlighted");
 }
 
 .button--go:hover {
-    background-color: var(--color-button-go-hover);
+    -unity-background-image-tint-color: #D8E8C8;
 }
 
 /* Stars */
 
 .star {
-    width: 40px;
-    height: 40px;
-    background-image: url("project://database/Assets/UI/Shared/Icons/star.png");
-    -unity-background-image-tint-color: var(--color-star-off);
+    width: 42px;
+    height: 38px;
+    background-image: url("project://database/Assets/Art/ui.png?fileID=-7975249404588759376&guid=e8afd4c812d601c478793753c404b6ba&type=3#Empty_Star");
+    -unity-background-scale-mode: scale-to-fit;
 }
 
 .star--on {
-    -unity-background-image-tint-color: var(--color-star-on);
+    background-image: url("project://database/Assets/Art/ui.png?fileID=7263181891274304025&guid=e8afd4c812d601c478793753c404b6ba&type=3#Star");
 }
 
 .star-row {
@@ -108,8 +127,8 @@
 }
 
 .star-row > .star {
-    width: 48px;
-    height: 48px;
+    width: 42px;
+    height: 38px;
 }
 
 .star-row__text {
@@ -128,20 +147,27 @@
     -unity-text-align: middle-right;
 }
 
-/* Animal colours (swatches and markers) */
+/* Animal colours (swatches and markers), from the [Color]_Background swatches in ui.png */
 
 .swatch {
-    width: 34px;
-    height: 34px;
+    width: 42px;
+    height: 42px;
     background-image: url("project://database/Assets/UI/Shared/Icons/circle.png");
+    -unity-background-scale-mode: scale-to-fit;
+    -unity-slice-left: 0;
+    -unity-slice-right: 0;
+    -unity-slice-top: 0;
+    -unity-slice-bottom: 0;
 }
 
-.color-red { -unity-background-image-tint-color: #E04540; }
-.color-blue { -unity-background-image-tint-color: #427FED; }
-.color-green { -unity-background-image-tint-color: #339E45; }
-.color-yellow { -unity-background-image-tint-color: #F5CC29; }
-.color-purple { -unity-background-image-tint-color: #9961D6; }
-.color-orange { -unity-background-image-tint-color: #F58C2E; }
+.color-red { background-image: url("project://database/Assets/Art/ui.png?fileID=9193187447140095505&guid=e8afd4c812d601c478793753c404b6ba&type=3#Red_Background"); }
+.color-blue { background-image: url("project://database/Assets/Art/ui.png?fileID=8825907884645483951&guid=e8afd4c812d601c478793753c404b6ba&type=3#Blue_Background"); }
+.color-green { background-image: url("project://database/Assets/Art/ui.png?fileID=8062878643169288418&guid=e8afd4c812d601c478793753c404b6ba&type=3#Green_Background"); }
+.color-yellow { background-image: url("project://database/Assets/Art/ui.png?fileID=-4044852013064114820&guid=e8afd4c812d601c478793753c404b6ba&type=3#Yellow_Background"); }
+.color-purple { background-image: url("project://database/Assets/Art/ui.png?fileID=-8761496183629611704&guid=e8afd4c812d601c478793753c404b6ba&type=3#Purple_Background"); }
+.color-orange { background-image: url("project://database/Assets/Art/ui.png?fileID=-9211019987572867793&guid=e8afd4c812d601c478793753c404b6ba&type=3#Orange_Background"); }
+.color-turquoise { background-image: url("project://database/Assets/Art/ui.png?fileID=-3439486116421378984&guid=e8afd4c812d601c478793753c404b6ba&type=3#Turquis_Background"); }
+/* No art for these yet: tinted circles */
 .color-pink { -unity-background-image-tint-color: #F580B8; }
 .color-white { -unity-background-image-tint-color: #F2F2F2; }
 

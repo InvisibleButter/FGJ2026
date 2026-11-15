@@ -1,3 +1,5 @@
+using System;
+using FGJ2026.Simulation;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -41,6 +43,31 @@ namespace FGJ2026.UI
         [Tooltip("Animal animations. States used: Animal_Idle, Animal_Move, Animal_Eat, Animal_Sing, Animal_Love, Animal_Sad.")]
         public RuntimeAnimatorController animal;
 
+        [Serializable]
+        public sealed class ColorVariant
+        {
+            public AnimalColor color;
+            [Tooltip("Override of the animal controller with this colour's frames (Assets/Art/AnimalColors).")]
+            public RuntimeAnimatorController animal;
+            [Tooltip("Override of the flag controller with this colour's frames.")]
+            public RuntimeAnimatorController flag;
+
+            [Tooltip("Animal animations per facing direction: North, East, South, West. Empty slots use 'animal'.")]
+            public RuntimeAnimatorController[] animalByFacing = new RuntimeAnimatorController[4];
+
+            /// <summary>The animal animations for a facing direction (falls back to <see cref="animal"/>).</summary>
+            public RuntimeAnimatorController AnimalFacing(Vector2Int facing)
+            {
+                int index = facing == Directions.North ? 0 : facing == Directions.East ? 1 : facing == Directions.South ? 2 : 3;
+                RuntimeAnimatorController byFacing = animalByFacing != null && index < animalByFacing.Length ? animalByFacing[index] : null;
+                return byFacing != null ? byFacing : animal;
+            }
+        }
+
+        [Header("Colours")]
+        [Tooltip("Animal and flag animations per colour. Colours without an entry use the animations above plus a colour marker.")]
+        public ColorVariant[] colorVariants = new ColorVariant[0];
+
         [Header("Songs")]
         [Tooltip("Notes drawn on every square a song covers, tinted in the singer's colour. Empty = tint the squares.")]
         public Sprite[] songNotes;
@@ -50,6 +77,10 @@ namespace FGJ2026.UI
         public Sprite badSweet;
 
         private static BoardArt cached;
+
+        /// <summary>This colour's animations, or null when the colour has no art of its own.</summary>
+        public ColorVariant VariantFor(AnimalColor color) =>
+            colorVariants == null ? null : Array.Find(colorVariants, v => v != null && v.color == color);
 
         public static BoardArt Load() => cached != null ? cached : cached = Resources.Load<BoardArt>(ResourcePath);
     }

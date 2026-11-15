@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!221 &22100000
+AnimatorOverrideController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Red_Animal_East
+  m_Controller: {fileID: 9100000, guid: 1f2f2ee033c10c34393ae83c0ef178ab, type: 2}
+  m_Clips:
+  - m_OriginalClip: {fileID: 7400000, guid: 513055937779d8549a70cd469ebf8031, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 1ef085c26cb853e478ee5cf93675f770, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 913c868a6995b654fafe39bb349f5710, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 9dc92a9c46abdff4c819674c8cb6c14b, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 421ab7e49626e544b82d5c790e9097f7, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: a29529d88bf3b5144ba78245f9d1d6dd, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: b67a0d7b861cddf47beced74f3f051bb, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 8c3c9803efce15148aa0a1a9cb36b30f, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 99e32993d4e007344b97d12251d83ac9, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: c16cfae13e4b5014ab2dad6d03b32cfd, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 9a836adee53d64d43a7b8855ffb619bc, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 08035b35cda1f9f4c93240533fe3b6b8, type: 2}

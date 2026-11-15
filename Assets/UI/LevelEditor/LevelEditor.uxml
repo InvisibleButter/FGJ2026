@@ -34,8 +34,7 @@
                         <ui:Button name="colorYellow" class="choice color-choice"><ui:VisualElement class="swatch color-yellow" /></ui:Button>
                         <ui:Button name="colorPurple" class="choice color-choice"><ui:VisualElement class="swatch color-purple" /></ui:Button>
                         <ui:Button name="colorOrange" class="choice color-choice"><ui:VisualElement class="swatch color-orange" /></ui:Button>
-                        <ui:Button name="colorPink" class="choice color-choice"><ui:VisualElement class="swatch color-pink" /></ui:Button>
-                        <ui:Button name="colorWhite" class="choice color-choice"><ui:VisualElement class="swatch color-white" /></ui:Button>
+                                                <ui:Button name="colorTurquoise" class="choice color-choice"><ui:VisualElement class="swatch color-turquoise" /></ui:Button>
                     </ui:VisualElement>
 
                     <ui:Label text="Level" class="section-title" />
@@ -131,8 +130,7 @@
                                 <ui:Button name="targetYellow" class="choice color-choice"><ui:VisualElement class="swatch color-yellow" /></ui:Button>
                                 <ui:Button name="targetPurple" class="choice color-choice"><ui:VisualElement class="swatch color-purple" /></ui:Button>
                                 <ui:Button name="targetOrange" class="choice color-choice"><ui:VisualElement class="swatch color-orange" /></ui:Button>
-                                <ui:Button name="targetPink" class="choice color-choice"><ui:VisualElement class="swatch color-pink" /></ui:Button>
-                                <ui:Button name="targetWhite" class="choice color-choice"><ui:VisualElement class="swatch color-white" /></ui:Button>
+                                                                <ui:Button name="targetTurquoise" class="choice color-choice"><ui:VisualElement class="swatch color-turquoise" /></ui:Button>
                             </ui:VisualElement>
                             <ui:VisualElement class="choice-row">
                                 <ui:Button name="targetGoodSweet" class="choice icon-choice"><ui:VisualElement class="item-icon item-icon--good-sweet" /></ui:Button>
@@ -170,7 +168,7 @@
 
         <!-- Open / new level window -->
         <ui:VisualElement name="openOverlay" class="overlay hidden">
-            <ui:VisualElement class="open-card">
+            <ui:VisualElement class="sign open-card">
                 <ui:Label text="Open a level" class="open-title" />
                 <ui:ScrollView name="openList" class="open-list" vertical-scroller-visibility="Hidden" horizontal-scroller-visibility="Hidden" />
                 <ui:VisualElement class="open-buttons">

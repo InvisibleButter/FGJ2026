@@ -13,7 +13,8 @@ namespace FGJ2026.Board
     /// Tilemap layers, bottom to top:
     ///   Underlay (water under the whole board and a margin) -> Obstacles (optional, on blocked squares) -> Grass (rule tile) -> Grass details (tufts) ->
     ///   Grid (faint lines between squares) -> Songs (tinted lines) -> Place hints (dots)
-    /// Then sprites: flag frames, flags, sweets, facing arrows, animal spots, animals, hover cursor.
+    /// Then sprites: flags, sweets, facing arrows, animals, hover cursor. Animals and flags use their colour's art from
+    /// <see cref="BoardArt.colorVariants"/>; colours without art get a coloured spot / flag frame instead.
     ///
     /// It only shows a <see cref="PuzzleSimulation"/>; all rules live in the simulation.
     /// </summary>
@@ -34,6 +35,8 @@ namespace FGJ2026.Board
         {
             public GameObject Root;
             public Animator Animator;
+            public BoardArt.ColorVariant Variant;
+            public Vector2Int Facing;
             public Transform Arrow;
             public Vector3 Position;
             public Vector3 Target;
@@ -136,6 +139,7 @@ namespace FGJ2026.Board
                 view.Root.SetActive(!animal.OffMap);
                 view.Arrow.gameObject.SetActive(!animal.OffMap && !animal.OnFlag);
                 view.Arrow.localEulerAngles = new Vector3(0f, 0f, Directions.Angle(animal.Facing));
+                Face(view, animal.Facing);
 
                 Vector3 target = CellCenter(animal.Cell);
                 if ((target - view.Position).sqrMagnitude > 2.1f)
@@ -176,6 +180,7 @@ namespace FGJ2026.Board
             {
                 AnimalView view = animals[animal.Index];
                 report.Actions.TryGetValue(animal.Index, out AnimalAction action);
+                Face(view, animal.Facing);
                 switch (action)
                 {
                     case AnimalAction.Move:
@@ -336,15 +341,20 @@ namespace FGJ2026.Board
         private void CreateFlag(FlagSetup flag)
         {
             Vector3 center = CellCenter(flag.Cell);
+            BoardArt.ColorVariant variant = art != null ? art.VariantFor(flag.Color) : null;
 
-            // The flag art is always the same colour; a frame in the animal's colour says whose flag it is.
-            SpriteRenderer frame = CreateSprite($"{flag.Color} flag frame", objects, PixelSprites.Frame, FlagFrameOrder);
-            frame.transform.position = center;
-            frame.color = Palette.Of(flag.Color);
-
-            if (art != null && art.flag != null)
+            // Colours without their own flag art get a frame in the animal's colour to say whose flag it is.
+            if (variant?.flag == null)
             {
-                SpriteRenderer animated = CreateSprite($"{flag.Color} flag", objects, null, FlagOrder, art.flag);
+                SpriteRenderer frame = CreateSprite($"{flag.Color} flag frame", objects, PixelSprites.Frame, FlagFrameOrder);
+                frame.transform.position = center;
+                frame.color = Palette.Of(flag.Color);
+            }
+
+            RuntimeAnimatorController controller = variant?.flag != null ? variant.flag : art != null ? art.flag : null;
+            if (controller != null)
+            {
+                SpriteRenderer animated = CreateSprite($"{flag.Color} flag", objects, null, FlagOrder, controller);
                 animated.transform.position = center;
             }
         }
@@ -354,13 +364,20 @@ namespace FGJ2026.Board
             var root = new GameObject($"{setup.Color} animal");
             root.transform.SetParent(objects, false);
 
-            SpriteRenderer spot = CreateSprite("Colour spot", root.transform, PixelSprites.Shadow, SpotOrder);
-            spot.color = Palette.Of(setup.Color);
+            BoardArt.ColorVariant variant = art != null ? art.VariantFor(setup.Color) : null;
+            RuntimeAnimatorController controller = variant?.animal != null ? variant.AnimalFacing(setup.Facing) : art != null ? art.animal : null;
+
+            // Colours without their own art get a coloured spot under the animal.
+            if (variant?.animal == null)
+            {
+                SpriteRenderer spot = CreateSprite("Colour spot", root.transform, PixelSprites.Shadow, SpotOrder);
+                spot.color = Palette.Of(setup.Color);
+            }
 
             Animator animator = null;
-            if (art != null && art.animal != null)
+            if (controller != null)
             {
-                SpriteRenderer body = CreateSprite("Body", root.transform, null, AnimalOrder, art.animal);
+                SpriteRenderer body = CreateSprite("Body", root.transform, null, AnimalOrder, controller);
                 animator = body.GetComponent<Animator>();
             }
             else
@@ -378,6 +395,8 @@ namespace FGJ2026.Board
             {
                 Root = root,
                 Animator = animator,
+                Variant = variant,
+                Facing = setup.Facing,
                 Arrow = arrow.transform,
                 Position = start,
                 Target = start,
@@ -513,6 +532,26 @@ namespace FGJ2026.Board
             // While placing items, dim the cursor over squares where nothing can be done.
             bool usable = lastSim == null || !lastShowHints || lastSim.CanPlaceAt(cell) || lastSim.IsPlacedToday(cell);
             cursor.color = usable ? Color.white : new Color(1f, 1f, 1f, 0.35f);
+        }
+
+        /// <summary>Swaps to the animations for the animal's facing direction, keeping the current state and frame.</summary>
+        private static void Face(AnimalView view, Vector2Int facing)
+        {
+            if (view.Facing == facing)
+                return;
+            view.Facing = facing;
+            if (view.Animator == null || view.Variant?.animal == null)
+                return;
+
+            RuntimeAnimatorController controller = view.Variant.AnimalFacing(facing);
+            if (controller == null || view.Animator.runtimeAnimatorController == controller)
+                return;
+
+            bool playing = view.Animator.gameObject.activeInHierarchy && view.State != null;
+            float time = playing ? view.Animator.GetCurrentAnimatorStateInfo(0).normalizedTime : 0f;
+            view.Animator.runtimeAnimatorController = controller;
+            if (playing)
+                view.Animator.Play(view.State, 0, time);
         }
 
         private static void Play(AnimalView view, string state)

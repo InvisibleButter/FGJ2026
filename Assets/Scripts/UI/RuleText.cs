@@ -32,7 +32,7 @@ namespace FGJ2026.UI
             }
         }
 
-        public static string Colour(AnimalColor color) => $"<b><color={Palette.Hex(Palette.Of(color))}>{color}</color></b>";
+        public static string Colour(AnimalColor color) => $"<b><color={Palette.Hex(Palette.TextOf(color))}>{color}</color></b>";
 
         public static string Item(ItemType item, bool capital = false)
         {

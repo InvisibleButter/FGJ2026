@@ -19,7 +19,7 @@
             </ui:VisualElement>
             <ui:VisualElement class="top-buttons" picking-mode="Ignore">
                 <ui:Button name="rewindButton" text="Rewind" class="top-button" />
-                <ui:Button name="exitButton" text="Exit" class="top-button" />
+                <ui:Button name="exitButton" tooltip="Exit" class="top-button exit-button" />
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="middle" class="middle" picking-mode="Ignore">
@@ -29,9 +29,11 @@
         </ui:VisualElement>
         <ui:VisualElement name="bottomBar" class="bottom-bar">
             <ui:VisualElement class="item-bag">
-                <ui:Label text="Item bag" class="item-bag__label" />
-                <ui:VisualElement name="itemList" class="item-list" />
-                <ui:Label name="emptyBagLabel" text="empty" class="text-dim hidden" />
+                <ui:VisualElement class="item-bag__icon" tooltip="Item bag" />
+                <ui:VisualElement class="item-bag__pocket">
+                    <ui:VisualElement name="itemList" class="item-list" />
+                    <ui:Label name="emptyBagLabel" text="empty" class="hidden" />
+                </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement class="status">
                 <ui:Label name="phaseLabel" text="Preparation" class="phase-label" />
@@ -43,7 +45,7 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="resultOverlay" class="overlay hidden">
-            <ui:VisualElement class="result-card">
+            <ui:VisualElement class="sign result-card">
                 <ui:Label name="resultTitle" text="Puzzle solved!" class="result-title" />
                 <ui:Label name="resultSubtitle" class="result-subtitle" />
                 <ui:VisualElement name="resultStars" />

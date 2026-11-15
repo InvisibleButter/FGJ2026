@@ -180,7 +180,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: 4
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -218,7 +218,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: ui_0
+      name: Start_UI_Frame
       rect:
         serializedVersion: 2
         x: 0
@@ -240,7 +240,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_1
+      name: Start_UI_Option
       rect:
         serializedVersion: 2
         x: 34
@@ -262,7 +262,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_2
+      name: Start_UI_Option_clicked
       rect:
         serializedVersion: 2
         x: 34
@@ -284,7 +284,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_3
+      name: Star
       rect:
         serializedVersion: 2
         x: 85
@@ -306,7 +306,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_4
+      name: Empty_Star
       rect:
         serializedVersion: 2
         x: 107
@@ -328,7 +328,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_5
+      name: Puzzle
       rect:
         serializedVersion: 2
         x: 1
@@ -350,7 +350,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_6
+      name: Start_UI_Titlebanner
       rect:
         serializedVersion: 2
         x: 33
@@ -372,7 +372,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_7
+      name: Stars
       rect:
         serializedVersion: 2
         x: 86
@@ -394,7 +394,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_8
+      name: Puzzle_highlighted
       rect:
         serializedVersion: 2
         x: 1
@@ -416,7 +416,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_9
+      name: Puzzle_Button
       rect:
         serializedVersion: 2
         x: 31
@@ -438,7 +438,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_10
+      name: Ticks_Background_22
       rect:
         serializedVersion: 2
         x: 93
@@ -460,7 +460,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_11
+      name: Background
       rect:
         serializedVersion: 2
         x: 2
@@ -482,7 +482,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_12
+      name: Puzzle_Clicked
       rect:
         serializedVersion: 2
         x: 31
@@ -504,7 +504,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_13
+      name: Puzzle_Previewborder
       rect:
         serializedVersion: 2
         x: 2
@@ -526,7 +526,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_14
+      name: Backpack
       rect:
         serializedVersion: 2
         x: 27
@@ -548,7 +548,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_15
+      name: Exit
       rect:
         serializedVersion: 2
         x: 59
@@ -570,7 +570,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_16
+      name: Ticks_Background
       rect:
         serializedVersion: 2
         x: 93
@@ -592,7 +592,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_17
+      name: Backpack_Background
       rect:
         serializedVersion: 2
         x: 0
@@ -614,7 +614,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_18
+      name: Ticks_Background_23
       rect:
         serializedVersion: 2
         x: 59
@@ -622,7 +622,7 @@ TextureImporter:
         width: 35
         height: 38
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -636,7 +636,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_21
+      name: Backpack_Itemframe
       rect:
         serializedVersion: 2
         x: 15
@@ -658,7 +658,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_22
+      name: Red_Background
       rect:
         serializedVersion: 2
         x: 1
@@ -680,7 +680,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_23
+      name: Red_Element
       rect:
         serializedVersion: 2
         x: 2
@@ -702,7 +702,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_24
+      name: Blue_Background
       rect:
         serializedVersion: 2
         x: 9
@@ -724,7 +724,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_25
+      name: Blue_Element
       rect:
         serializedVersion: 2
         x: 10
@@ -746,7 +746,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_26
+      name: Green_Background
       rect:
         serializedVersion: 2
         x: 17
@@ -768,7 +768,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_27
+      name: Green_Element
       rect:
         serializedVersion: 2
         x: 18
@@ -790,7 +790,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_28
+      name: Orange_Background
       rect:
         serializedVersion: 2
         x: 25
@@ -812,7 +812,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_29
+      name: Orange_Element
       rect:
         serializedVersion: 2
         x: 26
@@ -834,7 +834,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_30
+      name: Purple_Background
       rect:
         serializedVersion: 2
         x: 33
@@ -856,7 +856,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_31
+      name: Purple_Element
       rect:
         serializedVersion: 2
         x: 34
@@ -878,7 +878,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_32
+      name: Turquis_Background
       rect:
         serializedVersion: 2
         x: 41
@@ -900,7 +900,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_33
+      name: Turquis_Element
       rect:
         serializedVersion: 2
         x: 42
@@ -922,7 +922,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_34
+      name: Yellow_Background
       rect:
         serializedVersion: 2
         x: 49
@@ -944,7 +944,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_35
+      name: Yellow_Element
       rect:
         serializedVersion: 2
         x: 50
@@ -979,42 +979,42 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      ui_0: 5707218116961789024
-      ui_1: 3556181715638617739
-      ui_10: -7334886338573059942
-      ui_11: 8852797563311604980
-      ui_12: -7420991742971661633
-      ui_13: 6071220295474305178
-      ui_14: 2697481083480110284
-      ui_15: 1712464482933603101
-      ui_16: 4874896633046561287
-      ui_17: -7787622976490332879
-      ui_18: 3793417686556777753
+      Background: 8852797563311604980
+      Backpack: 2697481083480110284
+      Backpack_Background: -7787622976490332879
+      Backpack_Itemframe: 8950759142192175709
+      Blue_Background: 8825907884645483951
+      Blue_Element: -5130057317469923895
+      Empty_Star: -7975249404588759376
+      Exit: 1712464482933603101
+      Green_Background: 8062878643169288418
+      Green_Element: -2699499167317838321
+      Orange_Background: -9211019987572867793
+      Orange_Element: 621127007532356092
+      Purple_Background: -8761496183629611704
+      Purple_Element: 7285970225754692813
+      Puzzle: -9005941153719796207
+      Puzzle_Button: -6774437969098921397
+      Puzzle_Clicked: -7420991742971661633
+      Puzzle_Previewborder: 6071220295474305178
+      Puzzle_highlighted: -9080700020481880845
+      Red_Background: 9193187447140095505
+      Red_Element: -3120730603551926074
+      Star: 7263181891274304025
+      Stars: 8599436577718238185
+      Start_UI_Frame: 5707218116961789024
+      Start_UI_Option: 3556181715638617739
+      Start_UI_Option_clicked: -8816031292267695619
+      Start_UI_Titlebanner: 2163036573998151787
+      Ticks_Background: 4874896633046561287
+      Ticks_Background_22: -7334886338573059942
+      Ticks_Background_23: 3793417686556777753
+      Turquis_Background: -3439486116421378984
+      Turquis_Element: 1113166408476123525
+      Yellow_Background: -4044852013064114820
+      Yellow_Element: 6318320377479184414
       ui_19: 8450739732141010018
-      ui_2: -8816031292267695619
       ui_20: 5660285115890169063
-      ui_21: 8950759142192175709
-      ui_22: 9193187447140095505
-      ui_23: -3120730603551926074
-      ui_24: 8825907884645483951
-      ui_25: -5130057317469923895
-      ui_26: 8062878643169288418
-      ui_27: -2699499167317838321
-      ui_28: -9211019987572867793
-      ui_29: 621127007532356092
-      ui_3: 7263181891274304025
-      ui_30: -8761496183629611704
-      ui_31: 7285970225754692813
-      ui_32: -3439486116421378984
-      ui_33: 1113166408476123525
-      ui_34: -4044852013064114820
-      ui_35: 6318320377479184414
-      ui_4: -7975249404588759376
-      ui_5: -9005941153719796207
-      ui_6: 2163036573998151787
-      ui_7: 8599436577718238185
-      ui_8: -9080700020481880845
-      ui_9: -6774437969098921397
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

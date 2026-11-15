@@ -24,6 +24,63 @@ MonoBehaviour:
   hoverCursor: {fileID: 9100000, guid: 399493b5d285f694da40d6a7b00af031, type: 2}
   facingDirection: {fileID: 9100000, guid: 91d676f7dd3348647ad9dc2d0faf0c2a, type: 2}
   animal: {fileID: 9100000, guid: 1f2f2ee033c10c34393ae83c0ef178ab, type: 2}
+  colorVariants:
+  - color: 0
+    animal: {fileID: 22100000, guid: 05ea2552170a8b040b382f1bea16ee84, type: 2}
+    flag: {fileID: 22100000, guid: c845ba2c455cca64c86c70f954fe0fac, type: 2}
+    animalByFacing:
+    - {fileID: 22100000, guid: 974e25cb16c65b44391a4f8c2a0e673b, type: 2}
+    - {fileID: 22100000, guid: d0e7aa7af3131634d89e0dab578975e1, type: 2}
+    - {fileID: 22100000, guid: 4f5c5ebd3167dd947a5a543dfc80870f, type: 2}
+    - {fileID: 22100000, guid: 46451c0c61915b14dab384b9b5a7098e, type: 2}
+  - color: 1
+    animal: {fileID: 22100000, guid: e2216094a7710e143b540fc75df60d60, type: 2}
+    flag: {fileID: 22100000, guid: 7b8cc5d3179e11443a8730d6e4d47319, type: 2}
+    animalByFacing:
+    - {fileID: 22100000, guid: ff61f85ea74be94459b42feb3679d7b4, type: 2}
+    - {fileID: 22100000, guid: ef659e533f7606c47b3b8940068b5d5a, type: 2}
+    - {fileID: 22100000, guid: 450f54231cc92c5479e7cf99a6589872, type: 2}
+    - {fileID: 22100000, guid: e3458d394dfd9234d951ec474bdda08e, type: 2}
+  - color: 2
+    animal: {fileID: 22100000, guid: 8d9364f6c11e0fd449c87852f55e57f5, type: 2}
+    flag: {fileID: 22100000, guid: 091a45b9dfc5c654e92d88a4e74595c7, type: 2}
+    animalByFacing:
+    - {fileID: 22100000, guid: 18037973da2cfb54e9729a4d74d32bdd, type: 2}
+    - {fileID: 22100000, guid: 2824070cc5f06f9478af02151f8cf82c, type: 2}
+    - {fileID: 22100000, guid: 4c9c54028a5b87242b91cdfe7cb5699c, type: 2}
+    - {fileID: 22100000, guid: ee2ab835de65ad740b2af62cc88e7223, type: 2}
+  - color: 3
+    animal: {fileID: 22100000, guid: 4425955ea1665f0478e681239f60f215, type: 2}
+    flag: {fileID: 22100000, guid: f13a3b34563efa7429710da7c0e84657, type: 2}
+    animalByFacing:
+    - {fileID: 22100000, guid: 94d50ecf2ec645b429623a8b1ae1d12b, type: 2}
+    - {fileID: 22100000, guid: 606d4d750905e2b409e60c114950f168, type: 2}
+    - {fileID: 22100000, guid: 2913b236d297fcc43884a07372b5fd6e, type: 2}
+    - {fileID: 22100000, guid: ad31c9ccc31563f44bae516b9de61b53, type: 2}
+  - color: 4
+    animal: {fileID: 22100000, guid: 6c00ba3dea6b8da42af8ac8c5b4c276b, type: 2}
+    flag: {fileID: 22100000, guid: 9009bfd45c93f924bb65f596e0d8f864, type: 2}
+    animalByFacing:
+    - {fileID: 22100000, guid: 399afe11637ea3340935d9679a4e59fc, type: 2}
+    - {fileID: 22100000, guid: a97065da6e377ec429595de49111cb9f, type: 2}
+    - {fileID: 22100000, guid: 3ab1958870ed31f45863603a61200e43, type: 2}
+    - {fileID: 22100000, guid: 94847d285edc81840b4612ed3256bcdb, type: 2}
+  - color: 5
+    animal: {fileID: 22100000, guid: 01c223632b9d8114fb4ee016a2905b21, type: 2}
+    flag: {fileID: 22100000, guid: e43c9d6aef2e5d746a17bae14a38065c, type: 2}
+    animalByFacing:
+    - {fileID: 22100000, guid: f0c8e6ae4a8856743bdd662f9dabeff0, type: 2}
+    - {fileID: 22100000, guid: fa455ca90e4336e42936c9997416cd95, type: 2}
+    - {fileID: 22100000, guid: 3721816af42b26442b2d3d4c168b3298, type: 2}
+    - {fileID: 22100000, guid: 86179e0f171a15c43a579a8db6fb3c9e, type: 2}
+  - color: 8
+    animal: {fileID: 22100000, guid: 720dc8926e4c077439e5d8c15189da5f, type: 2}
+    flag: {fileID: 22100000, guid: d10e56d8ca2fdcb48bfc4f60ee717f3a, type: 2}
+    animalByFacing:
+    - {fileID: 22100000, guid: 4b7db0e45e76dea4c99ede96233031b0, type: 2}
+    - {fileID: 22100000, guid: a1428420fbea83f47bc22bf251dfcd5e, type: 2}
+    - {fileID: 22100000, guid: 1e5a5131d98877f4596fe45014f350e7, type: 2}
+    - {fileID: 22100000, guid: 8d2ea2d8e425f6d468883fe9a86d86d2, type: 2}
   songNotes:
   - {fileID: -7720169738128376768, guid: 6b67d35042a9a154e862226cb39d14c9, type: 3}
   - {fileID: -5612101955270952363, guid: 6b67d35042a9a154e862226cb39d14c9, type: 3}

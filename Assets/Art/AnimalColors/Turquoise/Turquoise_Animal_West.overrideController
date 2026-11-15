@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!221 &22100000
+AnimatorOverrideController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Turquoise_Animal_West
+  m_Controller: {fileID: 9100000, guid: 1f2f2ee033c10c34393ae83c0ef178ab, type: 2}
+  m_Clips:
+  - m_OriginalClip: {fileID: 7400000, guid: 513055937779d8549a70cd469ebf8031, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: ca8718778008286459c4ff94527ff3f1, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 913c868a6995b654fafe39bb349f5710, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: e273206561be91a4f94f9ac9c4c6e105, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 421ab7e49626e544b82d5c790e9097f7, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 94c196ace7d871a43b8d9166bd5ca64f, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: b67a0d7b861cddf47beced74f3f051bb, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 46d145746198cc84f8852c3939ad0b4a, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 99e32993d4e007344b97d12251d83ac9, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 09cfbf2d69a7a634e953dd44a6e5adf5, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 9a836adee53d64d43a7b8855ffb619bc, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: c78103074724ff649a8ae94e97122027, type: 2}

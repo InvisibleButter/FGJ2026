@@ -478,7 +478,10 @@ namespace FGJ2026
                 calendarLabel.text = $"Day {sim.DayNumber}";
 
             clockTick.text = sim.Tick.ToString("00");
-            clockCaption.text = $"of {level.TicksPerDay} ticks  <color=#A8AFBD>(total {sim.TotalTicks})</color>";
+            int ticksLeft = level.TicksPerDay - sim.Tick;
+            clockTick.EnableInClassList("clock__tick--late", ticksLeft <= level.TicksPerDay / 3 && ticksLeft > 3);
+            clockTick.EnableInClassList("clock__tick--last", ticksLeft <= 3);
+            clockCaption.text = $"of {level.TicksPerDay} ticks  <color=#D8C0A0>(total {sim.TotalTicks})</color>";
             clockBar.value = Mathf.Clamp01((float)sim.Tick / level.TicksPerDay);
 
             switch (sim.Phase)

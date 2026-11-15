@@ -30,7 +30,12 @@ namespace FGJ2026
         private const string Hidden = "hidden";
         private const string SelectedChoice = "choice--selected";
         private const int EndlessTestDays = 999;
-        private static readonly AnimalColor[] Colours = (AnimalColor[])Enum.GetValues(typeof(AnimalColor));
+        /// <summary>The colours that have animal and flag art (Pink and White exist in the rules but have no art yet).</summary>
+        private static readonly AnimalColor[] Colours =
+        {
+            AnimalColor.Red, AnimalColor.Blue, AnimalColor.Green, AnimalColor.Yellow,
+            AnimalColor.Purple, AnimalColor.Orange, AnimalColor.Turquoise
+        };
         private static readonly StarKind?[] StarChoices = { null, StarKind.MaxTicks, StarKind.MaxItems, StarKind.MaxDays };
 
         private GameManager game;

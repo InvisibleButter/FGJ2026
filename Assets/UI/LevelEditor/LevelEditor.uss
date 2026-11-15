@@ -14,6 +14,8 @@
     height: 96px;
     padding: 0 30px;
     background-color: var(--color-panel);
+    border-bottom-width: 6px;
+    border-color: var(--color-accent);
 }
 
 .editor-title {
@@ -114,16 +116,18 @@
     flex-shrink: 0;
     height: 42px;
     margin: 0 5px 0 0;
-    padding: 4px 9px;
+    padding: 4px 10px;
     font-size: 19px;
+    -unity-slice-scale: 4px;
 }
 
-.choice--selected {
-    background-color: var(--color-button);
+.choice--selected,
+.choice--selected:hover {
+    background-image: url("project://database/Assets/Art/ui.png?fileID=-9080700020481880845&guid=e8afd4c812d601c478793753c404b6ba&type=3#Puzzle_highlighted");
 }
 
 .choice--selected:hover {
-    background-color: var(--color-button-hover);
+    -unity-background-image-tint-color: #D8E8C8;
 }
 
 .color-choice {
@@ -134,8 +138,8 @@
 }
 
 .color-choice > .swatch {
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
 }
 
 .icon-choice {
@@ -169,6 +173,7 @@
     height: 40px;
     padding: 0;
     font-size: 26px;
+    -unity-slice-scale: 4px;
 }
 
 .stepper__value {
@@ -193,7 +198,7 @@
     border-color: var(--color-panel-light);
     border-radius: 4px;
     --unity-cursor-color: var(--color-text);
-    --unity-selection-color: rgba(66, 115, 194, 0.6);
+    --unity-selection-color: rgba(104, 152, 88, 0.7);
 }
 
 .name-field:focus .unity-base-text-field__input {
@@ -240,6 +245,7 @@
     height: 36px;
     padding: 0;
     font-size: 22px;
+    -unity-slice-scale: 4px;
 }
 
 .add-button {
@@ -252,14 +258,16 @@
     height: 48px;
     margin-top: 14px;
     font-size: 20px;
-    background-color: #8A3B3B;
+    -unity-slice-scale: 4px;
+    -unity-background-image-tint-color: #F0A0A0;
 }
 
 .danger-button:hover {
-    background-color: #A34848;
+    -unity-background-image-tint-color: #D88080;
 }
 
 .wide-button {
+    -unity-slice-scale: 4px;
     height: 48px;
     margin-top: 6px;
     font-size: 20px;
@@ -281,9 +289,6 @@
 
 .open-card {
     width: 620px;
-    padding: 30px;
-    background-color: var(--color-panel);
-    border-radius: 10px;
 }
 
 .open-title {

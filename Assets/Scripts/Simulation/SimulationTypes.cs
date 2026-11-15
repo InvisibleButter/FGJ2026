@@ -3,8 +3,11 @@ using UnityEngine;
 
 namespace FGJ2026.Simulation
 {
-    /// <summary>The colour of an animal. It is the animal's identity: how it looks and how its song sounds.</summary>
-    public enum AnimalColor { Red, Blue, Green, Yellow, Purple, Orange, Pink, White }
+    /// <summary>
+    /// The colour of an animal. It is the animal's identity: how it looks and how its song sounds.
+    /// New colours go at the end: assets store these as numbers. Pink and White have no art yet.
+    /// </summary>
+    public enum AnimalColor { Red, Blue, Green, Yellow, Purple, Orange, Pink, White, Turquoise }
 
     public enum ItemType { GoodSweet, BadSweet }
 
