@@ -416,8 +416,6 @@ namespace FGJ2026.Board
 
             var visuals = new GameObject("Visuals");
             visuals.transform.SetParent(root.transform, false);
-            SpriteRenderer spot = CreateSprite("Colour spot", visuals.transform, PixelSprites.Shadow, SpotOrder);
-            spot.color = Palette.Of(setup.Color);
             BoardArt.ColorVariant variant = art != null ? art.VariantFor(setup.Color) : null;
             RuntimeAnimatorController controller = variant?.animal != null ? variant.AnimalFacing(setup.Facing) : art != null ? art.animal : null;
 
@@ -433,14 +431,14 @@ namespace FGJ2026.Board
             // Colours without their own art get a coloured spot under the animal.
             if (variant?.animal == null)
             {
-                SpriteRenderer spot = CreateSprite("Colour spot", root.transform, PixelSprites.Shadow, SpotOrder);
+                SpriteRenderer spot = CreateSprite("Colour spot", visuals.transform, PixelSprites.Shadow, SpotOrder);
                 spot.color = Palette.Of(setup.Color);
             }
 
             Animator animator = null;
             if (controller != null)
             {
-                SpriteRenderer body = CreateSprite("Body", root.transform, null, AnimalOrder, controller);
+                SpriteRenderer body = CreateSprite("Body", visuals.transform, null, AnimalOrder, controller);
                 animator = body.GetComponent<Animator>();
             }
             else
