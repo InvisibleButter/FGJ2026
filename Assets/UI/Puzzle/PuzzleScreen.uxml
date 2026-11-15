@@ -7,14 +7,20 @@
                 <ui:Label name="puzzleName" text="Puzzle name" class="puzzle-name" />
             </ui:VisualElement>
             <ui:VisualElement class="calendar" picking-mode="Ignore">
-                <ui:Label name="calendarLabel" text="Day" class="calendar__label" />
-                <ui:VisualElement name="dayList" class="day-list" />
+                <ui:VisualElement name="calendar" class="calendar-view" picking-mode="Ignore">
+                    <ui:VisualElement name="calendarFrame" class="calendar-view__frame" picking-mode="Ignore" />
+                    <ui:Label name="calendarDay" text="1" class="calendar-view__day" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:Label name="calendarLabel" text="of 3" class="calendar__label" />
             </ui:VisualElement>
             <ui:VisualElement class="clock">
-                <ui:Label name="clockTick" text="00" class="clock__tick" />
+                <ui:VisualElement name="clockFace" class="clock__face">
+                    <ui:VisualElement name="clockHand" class="clock__hand" picking-mode="Ignore" />
+                    <ui:VisualElement class="clock__cap" picking-mode="Ignore" />
+                    <ui:Label name="clockTick" text="0/24" class="clock__tick" picking-mode="Ignore" />
+                </ui:VisualElement>
                 <ui:VisualElement class="clock__info">
-                    <ui:Label name="clockCaption" text="of 24 ticks" class="clock__caption" />
-                    <ui:ProgressBar name="clockBar" low-value="0" high-value="1" value="0" class="clock__bar" />
+                    <ui:Label name="clockCaption" text="ticks" class="clock__caption" />
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement class="top-buttons" picking-mode="Ignore">

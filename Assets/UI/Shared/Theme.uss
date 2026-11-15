@@ -35,7 +35,8 @@
     display: none;
 }
 
-/* Art from Assets/Art/ui.png. Sliced sprites use their own borders; -unity-slice-scale 6px = one art pixel is 6 screen pixels at 1080p. */
+/* Art from Assets/Art/ui.png. Pixel perfect: every art pixel is 3 or 6 units (-unity-slice-scale 3px / 6px, sizes = sprite size x 3 or x 6).
+   PixelPerfectUI.cs keeps 3 units a whole number of screen pixels. */
 
 .panel {
     background-image: url("project://database/Assets/Art/ui.png?fileID=-9005941153719796207&guid=e8afd4c812d601c478793753c404b6ba&type=3#Puzzle");
@@ -82,7 +83,7 @@
 }
 
 .unity-button:active {
-    scale: 0.97 0.97;
+    translate: 0 3px;
 }
 
 .unity-button:disabled {
@@ -109,9 +110,10 @@
 
 /* Stars */
 
+/* Star sprites are 21x19: drawn 3x */
 .star {
-    width: 42px;
-    height: 38px;
+    width: 63px;
+    height: 57px;
     background-image: url("project://database/Assets/Art/ui.png?fileID=-7975249404588759376&guid=e8afd4c812d601c478793753c404b6ba&type=3#Empty_Star");
     -unity-background-scale-mode: scale-to-fit;
 }
@@ -123,12 +125,7 @@
 .star-row {
     flex-direction: row;
     align-items: center;
-    height: 54px;
-}
-
-.star-row > .star {
-    width: 42px;
-    height: 38px;
+    height: 63px;
 }
 
 .star-row__text {
@@ -173,8 +170,9 @@
 
 /* Items */
 
+/* Sweet sprites are 15x16: drawn 3x (6x in the bag) */
 .item-icon {
-    width: 48px;
+    width: 45px;
     height: 48px;
     -unity-background-scale-mode: scale-to-fit;
 }

@@ -1,18 +1,18 @@
 {
     "id": "duet",
     "name": "Duet",
-    "width": 7,
-    "height": 5,
+    "width": 9,
+    "height": 7,
     "days": 3,
     "ticksPerDay": 24,
     "animals": [
-        { "color": "blue", "x": 3, "y": 4, "facing": "south", "behaviours": ["sing"] },
-        { "color": "red", "x": 0, "y": 2, "facing": "east", "behaviours": ["move"] },
-        { "color": "yellow", "x": 6, "y": 1, "facing": "west", "behaviours": ["move"] }
+        { "color": "blue", "x": 4, "y": 5, "facing": "south", "behaviours": ["sing"] },
+        { "color": "red", "x": 1, "y": 3, "facing": "east", "behaviours": ["move"] },
+        { "color": "yellow", "x": 7, "y": 2, "facing": "west", "behaviours": ["move"] }
     ],
     "flags": [
-        { "color": "red", "x": 3, "y": 3 },
-        { "color": "yellow", "x": 3, "y": 0 }
+        { "color": "red", "x": 4, "y": 4 },
+        { "color": "yellow", "x": 4, "y": 1 }
     ],
     "items": [
         { "type": "goodSweet", "count": 1 },
@@ -20,11 +20,11 @@
     ],
     "stars": [
         { "type": "solve" },
-        { "type": "maxTicks", "value": 13 },
+        { "type": "maxTicks", "value": 14 },
         { "type": "maxDays", "value": 2 }
     ],
     "solution": [
-        { "day": 1, "item": "goodSweet", "x": 3, "y": 2 },
-        { "day": 1, "item": "badSweet", "x": 3, "y": 1 }
+        { "day": 1, "item": "goodSweet", "x": 4, "y": 3 },
+        { "day": 1, "item": "badSweet", "x": 4, "y": 2 }
     ]
 }

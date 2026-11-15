@@ -1,16 +1,16 @@
 {
     "id": "unlearn",
     "name": "Unlearn",
-    "width": 5,
-    "height": 5,
+    "width": 7,
+    "height": 7,
     "days": 2,
     "ticksPerDay": 24,
     "animals": [
-        { "color": "blue", "x": 4, "y": 2, "facing": "west", "behaviours": ["sing"] },
-        { "color": "red", "x": 2, "y": 0, "facing": "north", "behaviours": ["move", "hear blue good"] }
+        { "color": "blue", "x": 5, "y": 3, "facing": "west", "behaviours": ["sing"] },
+        { "color": "red", "x": 3, "y": 1, "facing": "north", "behaviours": ["move", "hear blue good"] }
     ],
     "flags": [
-        { "color": "red", "x": 0, "y": 2 }
+        { "color": "red", "x": 1, "y": 3 }
     ],
     "items": [
         { "type": "goodSweet", "count": 1 },
@@ -22,6 +22,6 @@
         { "type": "maxItems", "value": 1 }
     ],
     "solution": [
-        { "day": 1, "item": "badSweet", "x": 2, "y": 2 }
+        { "day": 1, "item": "badSweet", "x": 3, "y": 3 }
     ]
 }

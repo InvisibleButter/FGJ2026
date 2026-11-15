@@ -386,7 +386,7 @@ MonoBehaviour:
   state: Animal_Sing
   notes: 1
   noteInterval: 0.9
-  noteSize: 32
+  noteSize: 28
   noteRise: 70
   noteLifetime: 1.8
 --- !u!114 &278472065
@@ -2814,7 +2814,7 @@ MonoBehaviour:
   state: Animal_Sing
   notes: 1
   noteInterval: 0.9
-  noteSize: 32
+  noteSize: 28
   noteRise: 70
   noteLifetime: 1.8
 --- !u!114 &1269209791
@@ -3946,7 +3946,7 @@ MonoBehaviour:
   state: Animal_Sing
   notes: 1
   noteInterval: 0.9
-  noteSize: 32
+  noteSize: 28
   noteRise: 70
   noteLifetime: 1.8
 --- !u!114 &1772628354
@@ -4042,7 +4042,7 @@ MonoBehaviour:
   state: Animal_Sing
   notes: 1
   noteInterval: 0.9
-  noteSize: 32
+  noteSize: 28
   noteRise: 70
   noteLifetime: 1.8
 --- !u!114 &1866222999
@@ -4481,7 +4481,7 @@ MonoBehaviour:
   state: Animal_Sing
   notes: 1
   noteInterval: 0.9
-  noteSize: 32
+  noteSize: 28
   noteRise: 70
   noteLifetime: 1.8
 --- !u!114 &2103131310

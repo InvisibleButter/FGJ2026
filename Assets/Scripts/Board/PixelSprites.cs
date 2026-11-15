@@ -8,7 +8,7 @@ namespace FGJ2026.Board
     {
         public const int Size = 16;
 
-        private static Sprite white, dot, frame, shadow, disc, gridLines, gridLeft, gridBottom;
+        private static Sprite white, dot, frame, shadow, disc, gridLines, gridLeft, gridBottom, facingMark;
 
         /// <summary>A full white square (tinted per tile for song lines and shading).</summary>
         public static Sprite White => white ? white : white = Make((x, y) => true);
@@ -28,6 +28,13 @@ namespace FGJ2026.Board
         public static Sprite GridLeft => gridLeft ? gridLeft : gridLeft = Make((x, y) => x == 0);
         /// <summary>Only the bottom line (squares in the left column).</summary>
         public static Sprite GridBottom => gridBottom ? gridBottom : gridBottom = Make((x, y) => y == 0);
+
+        /// <summary>
+        /// A small chevron at the right (east) edge of the square. Rotated with the animal, it quietly shows
+        /// which way the animal faces.
+        /// </summary>
+        public static Sprite FacingMark => facingMark ? facingMark : facingMark = Make((x, y) =>
+            (x == 15 && (y == 7 || y == 8)) || (x == 14 && (y == 6 || y == 9)) || (x == 13 && (y == 5 || y == 10)));
 
         /// <summary>A flat ellipse at the bottom of the square: the coloured spot under an animal.</summary>
         public static Sprite Shadow => shadow ? shadow : shadow = Make((x, y) =>

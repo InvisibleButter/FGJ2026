@@ -5,8 +5,9 @@
             <ui:VisualElement class="level-header">
                 <ui:Label text="Puzzles" class="level-title" />
                 <ui:VisualElement class="total-stars">
-                    <ui:VisualElement class="star star--on" />
-                    <ui:Label name="totalStarsLabel" text="0 / 0" class="total-stars__label" />
+                    <ui:VisualElement class="total-stars__icon">
+                        <ui:Label name="totalStarsLabel" text="0 / 0" class="total-stars__label" />
+                    </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="levelGrid" class="level-grid">

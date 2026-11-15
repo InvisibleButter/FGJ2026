@@ -1,16 +1,16 @@
 {
     "id": "eye-contact",
     "name": "Eye Contact",
-    "width": 6,
-    "height": 3,
+    "width": 8,
+    "height": 5,
     "days": 2,
     "ticksPerDay": 24,
     "animals": [
-        { "color": "green", "x": 0, "y": 2, "facing": "east", "behaviours": ["move"] },
-        { "color": "yellow", "x": 5, "y": 2, "facing": "west", "behaviours": [] }
+        { "color": "green", "x": 1, "y": 3, "facing": "east", "behaviours": ["move"] },
+        { "color": "yellow", "x": 6, "y": 3, "facing": "west", "behaviours": [] }
     ],
     "flags": [
-        { "color": "green", "x": 2, "y": 0 }
+        { "color": "green", "x": 3, "y": 1 }
     ],
     "items": [
         { "type": "goodSweet", "count": 1 },
@@ -22,7 +22,7 @@
         { "type": "maxItems", "value": 2 }
     ],
     "solution": [
-        { "day": 1, "item": "badSweet", "x": 1, "y": 2 },
-        { "day": 2, "item": "goodSweet", "x": 2, "y": 2 }
+        { "day": 1, "item": "badSweet", "x": 2, "y": 3 },
+        { "day": 2, "item": "goodSweet", "x": 3, "y": 3 }
     ]
 }

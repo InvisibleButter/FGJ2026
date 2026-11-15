@@ -72,6 +72,16 @@ namespace FGJ2026.UI
         [Tooltip("Notes drawn on every square a song covers, tinted in the singer's colour. Empty = tint the squares.")]
         public Sprite[] songNotes;
 
+        [Header("Emotes")]
+        [Tooltip("Pops up over an animal's head when it eats a good sweet.")]
+        public Sprite happyEmote;
+        [Tooltip("Pops up over an animal's head when it eats a bad sweet.")]
+        public Sprite sadEmote;
+
+        [Header("Calendar")]
+        [Tooltip("Tear-off calendar frames (Kalender_0..5): page, then the page being ripped off.")]
+        public Sprite[] calendarFrames;
+
         [Header("Items")]
         public Sprite goodSweet;
         public Sprite badSweet;

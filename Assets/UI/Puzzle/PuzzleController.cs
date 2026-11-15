@@ -22,7 +22,6 @@ namespace FGJ2026
         [SerializeField] private UIDocument document;
 
         [Header("Templates")]
-        [SerializeField] private VisualTreeAsset dayTemplate;
         [SerializeField] private VisualTreeAsset itemButtonTemplate;
         [SerializeField] private VisualTreeAsset behaviourPanelTemplate;
         [SerializeField] private VisualTreeAsset behaviourBlockTemplate;
@@ -57,7 +56,7 @@ namespace FGJ2026
         private Camera boardCamera;
 
         private readonly List<BehaviourPanel> panels = new List<BehaviourPanel>();
-        private readonly List<VisualElement> days = new List<VisualElement>();
+        private CalendarView calendar;
         private readonly Dictionary<ItemType, (Button button, Label label)> itemButtons = new Dictionary<ItemType, (Button, Label)>();
 
         private VisualElement root, boardArea, resultOverlay, resultStars;
@@ -65,7 +64,7 @@ namespace FGJ2026
         private Label phaseBannerLabel;
         private Coroutine phaseBannerAnimation;
         private Label calendarLabel, clockTick, clockCaption, phaseLabel, messageLabel, resultTitle, resultSubtitle;
-        private ProgressBar clockBar;
+        private VisualElement clockFace, clockHand;
         private Button startButton, skipButton, rewindButton;
         private Button nextPuzzleButton, playAgainButton, rewindDayButton, restartButton;
 
@@ -149,7 +148,8 @@ namespace FGJ2026
             boardArea = root.Q("boardArea");
             clockTick = root.Q<Label>("clockTick");
             clockCaption = root.Q<Label>("clockCaption");
-            clockBar = root.Q<ProgressBar>("clockBar");
+            clockFace = root.Q("clockFace");
+            clockHand = root.Q("clockHand");
             phaseLabel = root.Q<Label>("phaseLabel");
             messageLabel = root.Q<Label>("messageLabel");
             phaseBanner = root.Q("phaseBanner");
@@ -182,18 +182,12 @@ namespace FGJ2026
                 puzzlesButton.text = "Back to editor";
         }
 
-        /// <summary>Fills the level-dependent lists from templates: calendar days, behaviour panels, item bag.</summary>
+        /// <summary>Fills the level-dependent parts: calendar, behaviour panels (templates), item bag (templates).</summary>
         private void BuildLevelUi()
         {
-            VisualElement dayList = root.Q("dayList");
-            int dayBoxes = test != null && test.InfiniteDays ? 0 : level.Days; // endless test runs just count the days
-            for (int day = 1; day <= dayBoxes; day++)
-            {
-                TemplateContainer instance = dayTemplate.Instantiate();
-                instance.Q<Label>("dayNumber").text = day.ToString();
-                dayList.Add(instance);
-                days.Add(instance.Q("day"));
-            }
+            BoardArt art = BoardArt.Load();
+            calendar = new CalendarView(root.Q("calendar"), art != null ? art.calendarFrames : null);
+            calendarLabel.text = dayCountHidden ? "endless test" : $"of {level.Days}";
 
             VisualElement left = root.Q("leftColumn");
             VisualElement right = root.Q("rightColumn");
@@ -499,23 +493,14 @@ namespace FGJ2026
             foreach (BehaviourPanel panel in panels)
                 panel.Refresh(sim.Animals[panel.AnimalIndex]);
 
-            for (int i = 0; i < days.Count; i++)
-            {
-                bool current = i == sim.DayIndex && !sim.IsFinished;
-                bool past = i < sim.DayIndex || (i == sim.DayIndex && sim.IsFinished);
-                days[i].EnableInClassList("day--current", current);
-                days[i].EnableInClassList("day--past", past);
-            }
+            calendar.Show(sim.DayNumber);
 
-            if (dayCountHidden)
-                calendarLabel.text = $"Day {sim.DayNumber}";
-
-            clockTick.text = sim.Tick.ToString("00");
+            clockTick.text = $"{sim.Tick}/{level.TicksPerDay}";
+            clockCaption.text = $"ticks today  (total {sim.TotalTicks})";
             int ticksLeft = level.TicksPerDay - sim.Tick;
-            clockTick.EnableInClassList("clock__tick--late", ticksLeft <= level.TicksPerDay / 3 && ticksLeft > 3);
-            clockTick.EnableInClassList("clock__tick--last", ticksLeft <= 3);
-            clockCaption.text = $"of {level.TicksPerDay} ticks  <color=#D8C0A0>(total {sim.TotalTicks})</color>";
-            clockBar.value = Mathf.Clamp01((float)sim.Tick / level.TicksPerDay);
+            clockFace.EnableInClassList("clock__face--late", ticksLeft <= level.TicksPerDay / 3 && ticksLeft > 3);
+            clockFace.EnableInClassList("clock__face--last", ticksLeft <= 3);
+            clockHand.style.rotate = new Rotate(360f * Mathf.Clamp01((float)sim.Tick / level.TicksPerDay));
 
             switch (sim.Phase)
             {
@@ -528,7 +513,9 @@ namespace FGJ2026
             foreach (var pair in itemButtons)
             {
                 int remaining = sim.GetRemaining(pair.Key);
-                pair.Value.label.text = $"{RuleText.Item(pair.Key, true)}\n<b>x{remaining}</b>";
+                pair.Value.label.text = RuleText.Item(pair.Key, true);
+                pair.Value.button.Q<Label>("itemCount").text = remaining.ToString();
+                pair.Value.button.tooltip = string.Empty;
                 pair.Value.button.SetEnabled(preparing && remaining > 0);
                 pair.Value.button.EnableInClassList("item-button--selected", preparing && selectedItem == pair.Key);
             }

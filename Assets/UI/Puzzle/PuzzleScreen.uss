@@ -11,7 +11,7 @@
 .top-bar {
     flex-direction: row;
     align-items: center;
-    height: 120px;
+    height: 138px;
     padding: 0 40px;
 }
 
@@ -36,98 +36,103 @@
 }
 
 .calendar__label {
-    margin-right: 10px;
+    margin-left: 12px;
     font-size: 26px;
     color: var(--color-text-dim);
 }
 
-.day-list {
-    flex-direction: row;
+/* Tear-off calendar: 28x22 art pixels at 6x; the frames are placed by CalendarView.cs */
+.calendar-view {
+    width: 168px;
+    height: 132px;
+    margin-top: 42px; /* page level with the clock; the ripped page falls below the bar */
+    overflow: hidden;
 }
 
-.day {
+.calendar-view__frame {
+    position: absolute;
+}
+
+/* The writable part of the page */
+.calendar-view__day {
+    position: absolute;
+    left: 84px;
+    top: 12px;
     width: 72px;
     height: 72px;
-    margin-right: 10px;
-    background-image: url("project://database/Assets/Art/ui.png?fileID=-9005941153719796207&guid=e8afd4c812d601c478793753c404b6ba&type=3#Puzzle");
-    -unity-slice-scale: 4px;
-    transition-duration: 0.3s;
-}
-
-.day__label {
-    flex-grow: 1;
-    font-size: 30px;
+    color: var(--color-text-dark);
+    font-size: 48px;
     -unity-font-style: bold;
     -unity-text-align: middle-center;
-}
-
-.day--past {
-    opacity: 0.55;
-}
-
-.day--past > .day__label {
-    color: var(--color-text-dim);
-}
-
-.day--current {
-    background-image: url("project://database/Assets/Art/ui.png?fileID=-9080700020481880845&guid=e8afd4c812d601c478793753c404b6ba&type=3#Puzzle_highlighted");
 }
 
 .clock {
     flex-direction: row;
     align-items: center;
-    width: 380px;
+    width: 330px;
 }
 
-/* Pocket watch: white, pink when the day gets late, red for the last ticks */
-.clock__tick {
+/* Pocket watch: the hand goes round once per day. White, pink when the day gets late, red for the last ticks. */
+.clock__face {
     width: 105px;
     height: 114px;
     margin-right: 14px;
-    padding-top: 14px;
     background-image: url("project://database/Assets/Art/ui.png?fileID=4874896633046561287&guid=e8afd4c812d601c478793753c404b6ba&type=3#Ticks_Background");
     -unity-background-scale-mode: scale-to-fit;
-    color: var(--color-text-dark);
-    font-size: 40px;
-    -unity-font-style: bold;
-    -unity-text-align: middle-center;
 }
 
-.clock__tick--late {
+.clock__face--late {
     background-image: url("project://database/Assets/Art/ui.png?fileID=-7334886338573059942&guid=e8afd4c812d601c478793753c404b6ba&type=3#Ticks_Background_22");
 }
 
-.clock__tick--last {
+.clock__face--last {
     background-image: url("project://database/Assets/Art/ui.png?fileID=3793417686556777753&guid=e8afd4c812d601c478793753c404b6ba&type=3#Ticks_Background_23");
-    color: var(--color-text);
+}
+
+/* Dial centre: art pixel (17, 20) of the 35x38 sprite, drawn 3x */
+.clock__hand {
+    position: absolute;
+    left: 51px;
+    top: 33px;
+    width: 3px;
+    height: 30px;
+    background-color: #483848;
+    transform-origin: 50% 100%;
+}
+
+.clock__cap {
+    position: absolute;
+    left: 48px;
+    top: 58px;
+    width: 9px;
+    height: 9px;
+    background-color: #483848;
 }
 
 .clock__info {
     flex-grow: 1;
 }
 
+/* Tick count on the lower half of the dial, in front of the hand */
+.clock__tick {
+    position: absolute;
+    left: 15px;
+    right: 15px;
+    top: 66px;
+    height: 27px;
+    color: var(--color-text-dark);
+    font-size: 22px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}
+
+.clock__face--last > .clock__tick {
+    color: var(--color-text);
+}
+
 .clock__caption {
     font-size: 20px;
-}
-
-.clock__bar {
-    margin: 6px 0 0 0;
-}
-
-.clock__bar .unity-progress-bar__background {
-    height: 10px;
-    background-color: var(--color-panel);
-    border-width: 0;
-    border-radius: 5px;
-}
-
-.clock__bar .unity-progress-bar__progress {
-    background-color: var(--color-accent);
-    border-radius: 5px;
-}
-
-.clock__bar .unity-progress-bar__title-container {
-    display: none;
+    color: var(--color-text-dim);
 }
 
 .top-buttons {
@@ -142,8 +147,8 @@
 /* Exit is the little door */
 .exit-button,
 .exit-button:hover {
-    width: 68px;
-    height: 84px;
+    width: 51px;
+    height: 63px;
     padding: 0;
     background-image: url("project://database/Assets/Art/ui.png?fileID=1712464482933603101&guid=e8afd4c812d601c478793753c404b6ba&type=3#Exit");
     -unity-background-scale-mode: scale-to-fit;
@@ -174,20 +179,32 @@
     margin-bottom: 16px;
 }
 
+/* Panel = the animal's [Color]_Background, each behaviour = its [Color]_Element */
+.panel.behaviour-panel--red { background-image: url("project://database/Assets/Art/ui.png?fileID=9193187447140095505&guid=e8afd4c812d601c478793753c404b6ba&type=3#Red_Background"); }
+.panel.behaviour-panel--blue { background-image: url("project://database/Assets/Art/ui.png?fileID=8825907884645483951&guid=e8afd4c812d601c478793753c404b6ba&type=3#Blue_Background"); }
+.panel.behaviour-panel--green { background-image: url("project://database/Assets/Art/ui.png?fileID=8062878643169288418&guid=e8afd4c812d601c478793753c404b6ba&type=3#Green_Background"); }
+.panel.behaviour-panel--yellow { background-image: url("project://database/Assets/Art/ui.png?fileID=-4044852013064114820&guid=e8afd4c812d601c478793753c404b6ba&type=3#Yellow_Background"); }
+.panel.behaviour-panel--purple { background-image: url("project://database/Assets/Art/ui.png?fileID=-8761496183629611704&guid=e8afd4c812d601c478793753c404b6ba&type=3#Purple_Background"); }
+.panel.behaviour-panel--orange { background-image: url("project://database/Assets/Art/ui.png?fileID=-9211019987572867793&guid=e8afd4c812d601c478793753c404b6ba&type=3#Orange_Background"); }
+.panel.behaviour-panel--turquoise { background-image: url("project://database/Assets/Art/ui.png?fileID=-3439486116421378984&guid=e8afd4c812d601c478793753c404b6ba&type=3#Turquis_Background"); }
+
 .behaviour-panel__header {
     flex-direction: row;
     align-items: center;
     height: 40px;
 }
 
+.behaviour-panel__header > .swatch {
+    display: none;
+}
+
 .behaviour-panel__name {
-    margin-left: 12px;
     font-size: 30px;
     -unity-font-style: bold;
 }
 
 .behaviour-panel__status {
-    margin: 4px 0 8px 0;
+    margin: 2px 0 8px 0;
     font-size: 20px;
     color: var(--color-text-dim);
 }
@@ -198,17 +215,35 @@
     -unity-font-style: italic;
 }
 
+/* Light colours (green, yellow, orange, blue) get dark text */
+.behaviour-panel--light .behaviour-panel__name,
+.behaviour-panel--light .behaviour-panel__status,
+.behaviour-panel--light .behaviour-panel__empty {
+    color: var(--color-text-dark);
+}
+
 .behaviour-block {
     min-height: 52px;
     margin-top: 6px;
     padding: 10px 16px;
     justify-content: center;
-    background-color: #284848;
+    border-width: 0;
+    border-color: var(--color-text-dark);
+    -unity-slice-scale: 6px;
     transition-duration: 0.5s;
 }
 
+.behaviour-block--red { background-image: url("project://database/Assets/Art/ui.png?fileID=-3120730603551926074&guid=e8afd4c812d601c478793753c404b6ba&type=3#Red_Element"); }
+.behaviour-block--blue { background-image: url("project://database/Assets/Art/ui.png?fileID=-5130057317469923895&guid=e8afd4c812d601c478793753c404b6ba&type=3#Blue_Element"); }
+.behaviour-block--green { background-image: url("project://database/Assets/Art/ui.png?fileID=-2699499167317838321&guid=e8afd4c812d601c478793753c404b6ba&type=3#Green_Element"); }
+.behaviour-block--yellow { background-image: url("project://database/Assets/Art/ui.png?fileID=6318320377479184414&guid=e8afd4c812d601c478793753c404b6ba&type=3#Yellow_Element"); }
+.behaviour-block--purple { background-image: url("project://database/Assets/Art/ui.png?fileID=7285970225754692813&guid=e8afd4c812d601c478793753c404b6ba&type=3#Purple_Element"); }
+.behaviour-block--orange { background-image: url("project://database/Assets/Art/ui.png?fileID=621127007532356092&guid=e8afd4c812d601c478793753c404b6ba&type=3#Orange_Element"); }
+.behaviour-block--turquoise { background-image: url("project://database/Assets/Art/ui.png?fileID=1113166408476123525&guid=e8afd4c812d601c478793753c404b6ba&type=3#Turquis_Element"); }
+
 .behaviour-block__text {
     font-size: 24px;
+    color: var(--color-text-dark);
     white-space: normal;
 }
 
@@ -216,15 +251,16 @@
     opacity: 0.5;
 }
 
+/* The behaviour in use gets a dark outline for a moment */
 .behaviour-block--active {
-    background-color: rgba(0, 0, 0, 0);
-    background-image: url("project://database/Assets/Art/ui.png?fileID=-9080700020481880845&guid=e8afd4c812d601c478793753c404b6ba&type=3#Puzzle_highlighted");
-    -unity-slice-scale: 4px;
+    border-width: 3px;
     transition-duration: 0s;
 }
 
+/* A lesson that starts working today flashes with a gold outline */
 .behaviour-block--learned {
-    background-color: #B89848;
+    border-width: 6px;
+    border-color: var(--color-accent);
     opacity: 1;
     transition-duration: 0s;
 }
@@ -234,7 +270,7 @@
 .bottom-bar {
     flex-direction: row;
     align-items: center;
-    height: 160px;
+    height: 168px;
     padding: 0 40px;
     background-color: var(--color-panel);
     border-top-width: 6px;
@@ -248,10 +284,12 @@
 }
 
 /* The backpack, then a brown pocket holding the items */
+/* 33x34 at 6x: the sack sits on the bar and sticks out over its top edge */
 .item-bag__icon {
-    width: 99px;
-    height: 102px;
-    margin-right: 10px;
+    width: 198px;
+    height: 204px;
+    margin: 0 10px 0 -20px;
+    align-self: flex-end;
     background-image: url("project://database/Assets/Art/ui.png?fileID=2697481083480110284&guid=e8afd4c812d601c478793753c404b6ba&type=3#Backpack");
     -unity-background-scale-mode: scale-to-fit;
 }
@@ -259,7 +297,7 @@
 .item-bag__pocket {
     flex-direction: row;
     align-items: center;
-    min-height: 120px;
+    min-height: 132px;
     padding: 10px 14px;
     background-image: url("project://database/Assets/Art/ui.png?fileID=-7787622976490332879&guid=e8afd4c812d601c478793753c404b6ba&type=3#Backpack_Background");
     -unity-slice-scale: 6px;
@@ -277,10 +315,9 @@
 .item-button {
     flex-direction: row;
     align-items: center;
-    width: 240px;
-    height: 100px;
+    height: 120px;
     margin: 0 4px;
-    padding: 8px 18px;
+    padding: 8px 18px 8px 14px;
 }
 
 .item-button:hover {
@@ -295,15 +332,34 @@
 }
 
 .item-button > .item-icon {
-    margin-right: 14px;
+    width: 90px;
+    height: 96px;
 }
 
-.item-button__label {
-    flex-grow: 1;
-    font-size: 24px;
+.item-button__count {
+    margin-right: 8px;
+    font-size: 40px;
+    -unity-font-style: bold;
     color: var(--color-text-dark);
-    -unity-text-align: middle-left;
-    white-space: normal;
+}
+
+/* The name only shows while hovering, as a little banner above the item */
+.item-button__label {
+    display: none;
+    position: absolute;
+    bottom: 112px;
+    left: 0;
+    padding: 8px 18px;
+    background-image: url("project://database/Assets/Art/ui.png?fileID=2163036573998151787&guid=e8afd4c812d601c478793753c404b6ba&type=3#Start_UI_Titlebanner");
+    -unity-slice-scale: 3px;
+    color: var(--color-text-dark);
+    font-size: 22px;
+    -unity-font-style: bold;
+    white-space: nowrap;
+}
+
+.item-button:hover > .item-button__label {
+    display: flex;
 }
 
 .status {

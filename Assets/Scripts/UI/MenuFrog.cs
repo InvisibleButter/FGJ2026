@@ -21,7 +21,7 @@ namespace FGJ2026.UI
         [SerializeField] private string state = "Animal_Sing";
         [SerializeField] private bool notes = true;
         [SerializeField, Min(0.2f)] private float noteInterval = 0.9f;
-        [SerializeField] private float noteSize = 32f;
+        [SerializeField] private float noteSize = 28f; // note sprites are 7x7: 4 units per art pixel, like the menu
         [SerializeField] private float noteRise = 70f;
         [SerializeField, Min(0.2f)] private float noteLifetime = 1.8f;
 

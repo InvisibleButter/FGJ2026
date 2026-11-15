@@ -61,6 +61,8 @@ namespace FGJ2026.Simulation
         public List<string> Events { get; } = new List<string>();
         /// <summary>What each animal did, by animal index. Animals that did nothing are missing.</summary>
         public Dictionary<int, AnimalAction> Actions { get; } = new Dictionary<int, AnimalAction>();
+        /// <summary>What each animal ate this tick, by animal index.</summary>
+        public Dictionary<int, ItemType> Eaten { get; } = new Dictionary<int, ItemType>();
         /// <summary>Set when this tick ended the day.</summary>
         public DayReport DayEnded { get; internal set; }
 
@@ -312,6 +314,7 @@ namespace FGJ2026.Simulation
             {
                 items.Remove(animal.Cell);
                 report.Actions[animal.Index] = AnimalAction.Eat;
+                report.Eaten[animal.Index] = item;
                 report.Events.Add($"{animal.Color} eats a {Names.Of(item)}.");
                 Learn(animal, item == ItemType.GoodSweet, heard, seen, report);
                 return;

@@ -118,7 +118,7 @@
     margin: 0 5px 0 0;
     padding: 4px 10px;
     font-size: 19px;
-    -unity-slice-scale: 4px;
+    -unity-slice-scale: 3px;
 }
 
 .choice--selected,
@@ -138,20 +138,21 @@
 }
 
 .color-choice > .swatch {
-    width: 28px;
-    height: 28px;
+    width: 21px;
+    height: 21px;
 }
 
 .icon-choice {
-    width: 52px;
+    width: 60px;
+    height: 54px;
     padding: 0;
     align-items: center;
     justify-content: center;
 }
 
 .icon-choice > .item-icon {
-    width: 32px;
-    height: 32px;
+    width: 45px;
+    height: 48px;
 }
 
 /* Steppers */
@@ -173,7 +174,7 @@
     height: 40px;
     padding: 0;
     font-size: 26px;
-    -unity-slice-scale: 4px;
+    -unity-slice-scale: 3px;
 }
 
 .stepper__value {
@@ -245,7 +246,7 @@
     height: 36px;
     padding: 0;
     font-size: 22px;
-    -unity-slice-scale: 4px;
+    -unity-slice-scale: 3px;
 }
 
 .add-button {
@@ -258,7 +259,7 @@
     height: 48px;
     margin-top: 14px;
     font-size: 20px;
-    -unity-slice-scale: 4px;
+    -unity-slice-scale: 3px;
     -unity-background-image-tint-color: #F0A0A0;
 }
 
@@ -267,7 +268,7 @@
 }
 
 .wide-button {
-    -unity-slice-scale: 4px;
+    -unity-slice-scale: 3px;
     height: 48px;
     margin-top: 6px;
     font-size: 20px;

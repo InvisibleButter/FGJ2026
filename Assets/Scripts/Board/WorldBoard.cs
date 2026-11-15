@@ -12,7 +12,8 @@ namespace FGJ2026.Board
     ///
     /// Tilemap layers, bottom to top:
     ///   Underlay (water under the whole board and a margin) -> Obstacles (optional, on blocked squares) -> Grass (rule tile) -> Grass details (tufts) ->
-    ///   Grid (faint lines between squares) -> Songs (tinted lines) -> Place hints (dots)
+    ///   Grid (faint lines between squares) -> Songs (note tiles, previews only) -> Place hints (unused)
+    /// Song notes fly from the singers on interactive boards (see UpdateNotes).
     /// Then sprites: flags, sweets, facing arrows, animals, hover cursor. Animals and flags use their colour's art from
     /// <see cref="BoardArt.colorVariants"/>; colours without art get a coloured spot / flag frame instead.
     ///
@@ -24,9 +25,13 @@ namespace FGJ2026.Board
 
         // Sorting orders (all on the Default sorting layer).
         private const int UnderlayOrder = -7, WaterOrder = -6, GrassOrder = -5, DetailOrder = -4, GridOrder = -3, SongOrder = -2, HintOrder = -1;
-        private const int FlagFrameOrder = 0, FlagOrder = 1, ItemOrder = 2, ArrowOrder = 3, SpotOrder = 4, AnimalOrder = 5, CursorOrder = 10;
+        private const int FlagFrameOrder = 0, FlagOrder = 1, ItemOrder = 2, ArrowOrder = 3, SpotOrder = 4, AnimalOrder = 5, NoteOrder = 6, EmoteOrder = 7, CursorOrder = 10;
 
         private const float MoveDuration = 0.3f; // seconds an animal takes to slide to the next square
+
+        // Emote over the head after eating: pops up, floats a little, fades away.
+        private const float EmoteDuration = 1.4f;
+        private const float EmoteHeight = 0.75f; // above the square's centre, just over the frog's head
 
         private const string Idle = "Animal_Idle", Move = "Animal_Move", Eat = "Animal_Eat",
             Sing = "Animal_Sing", Love = "Animal_Love", Sad = "Animal_Sad";
@@ -36,6 +41,8 @@ namespace FGJ2026.Board
             public GameObject Root;
             public GameObject Visuals;
             public Animator Animator;
+            public SpriteRenderer Emote;
+            public float EmoteAge = -1f; // < 0: no emote showing
             public AudioSource AudioSource;
             public BoardArt.ColorVariant Variant;
             public Vector2Int Facing;
@@ -53,6 +60,31 @@ namespace FGJ2026.Board
         private readonly Tilemap songs, hints;
         private readonly Tile whiteTile, dotTile;
         private readonly Tile[] noteTiles;
+        private readonly Sprite[] noteSprites;
+        private readonly bool interactive;
+
+        // Flying song notes: each singer sends notes along its song line.
+        private const float NoteInterval = 0.45f; // seconds between two notes of one singer
+        private const float NoteSpeed = 2.2f;     // squares per second
+
+        private sealed class SongSource
+        {
+            public Vector3 Start, Direction;
+            public float Length, Timer;
+            public Color Colour;
+        }
+
+        private sealed class FlyingNote
+        {
+            public SpriteRenderer Renderer;
+            public Vector3 Start, Direction;
+            public float Length, Age, Side;
+        }
+
+        private readonly Dictionary<int, SongSource> songSources = new Dictionary<int, SongSource>();
+        private readonly List<FlyingNote> flyingNotes = new List<FlyingNote>();
+        private readonly List<SpriteRenderer> notePool = new List<SpriteRenderer>();
+        private int noteCounter;
         private readonly Transform objects;
         private readonly Dictionary<int, AnimalView> animals = new Dictionary<int, AnimalView>();
         private readonly Dictionary<Vector2Int, (ItemType type, GameObject view)> items = new Dictionary<Vector2Int, (ItemType, GameObject)>();
@@ -88,6 +120,8 @@ namespace FGJ2026.Board
                     if (note != null)
                         notes.Add(MakeTile(note));
             noteTiles = notes.ToArray();
+            noteSprites = System.Array.FindAll(art != null && art.songNotes != null ? art.songNotes : new Sprite[0], n => n != null);
+            this.interactive = interactive;
 
             Tilemap underlay = CreateLayer("Underlay", UnderlayOrder);
             Tilemap water = CreateLayer("Obstacles", WaterOrder);
@@ -210,7 +244,8 @@ namespace FGJ2026.Board
                 return;
 
             view.PlanningSinging = false;
-            view.AudioSource.Stop();
+            if (view.AudioSource != null) // already destroyed when the scene is unloading
+                view.AudioSource.Stop();
             Play(view, Idle);
         }
 
@@ -235,7 +270,11 @@ namespace FGJ2026.Board
                 {
                     case AnimalAction.Move:
                     case AnimalAction.LeaveMap: Play(view, Move); break;
-                    case AnimalAction.Eat: Play(view, Eat); break;
+                    case AnimalAction.Eat:
+                        Play(view, Eat);
+                        if (report.Eaten.TryGetValue(animal.Index, out ItemType eaten))
+                            ShowEmote(view, eaten == ItemType.GoodSweet);
+                        break;
                     case AnimalAction.ReachFlag: Play(view, Love); break;
                     case AnimalAction.Wait:
                         Play(view, Sad);
@@ -254,6 +293,8 @@ namespace FGJ2026.Board
             foreach (AnimalView view in animals.Values)
                 view.Position = Vector3.MoveTowards(view.Position, view.Target, step);
             ApplyPositions();
+            UpdateNotes(deltaTime);
+            UpdateEmotes(deltaTime);
         }
 
         public void SetHover(Vector2Int? cell)
@@ -447,9 +488,12 @@ namespace FGJ2026.Board
                 body.color = Palette.Of(setup.Color);
             }
 
+            SpriteRenderer emote = CreateSprite("Emote", visuals.transform, null, EmoteOrder);
+            emote.gameObject.SetActive(false);
+
             // The arrow sits on the square in front of the animal and turns with it.
-            SpriteRenderer arrow = CreateSprite($"{setup.Color} facing", objects, PixelSprites.Dot, ArrowOrder,
-                art != null ? art.facingDirection : null);
+            SpriteRenderer arrow = CreateSprite($"{setup.Color} facing", objects, PixelSprites.FacingMark, ArrowOrder);
+            arrow.color = new Color(0.22f, 0.09f, 0.16f, 0.45f);
 
             Vector3 start = CellCenter(setup.Cell);
             var view = new AnimalView
@@ -457,6 +501,7 @@ namespace FGJ2026.Board
                 Root = root,
                 Visuals = visuals,
                 Animator = animator,
+                Emote = emote,
                 AudioSource = audioSource,
                 Variant = variant,
                 Facing = setup.Facing,
@@ -489,23 +534,51 @@ namespace FGJ2026.Board
         private void RefreshSongs(PuzzleSimulation sim)
         {
             songs.ClearAllTiles();
+            bool flying = interactive && noteSprites.Length > 0;
+            var singers = new HashSet<int>();
             var colours = new Dictionary<Vector2Int, (Color sum, int count)>();
+
             foreach (SongLine song in sim.GetSongs())
             {
                 Color colour = Palette.Of(song.Singer.Color);
+                int length = 0;
                 foreach (Vector2Int cell in song.Cells)
                 {
+                    length++;
                     colours.TryGetValue(cell, out var entry);
                     colours[cell] = (entry.sum + colour, entry.count + 1);
                 }
+                if (!flying || length == 0)
+                    continue;
+
+                int singer = song.Singer.Index;
+                singers.Add(singer);
+                if (!songSources.TryGetValue(singer, out SongSource source))
+                    songSources[singer] = source = new SongSource { Timer = 0f };
+                Vector2Int dir = song.Singer.Facing;
+                source.Start = CellCenter(song.Singer.Cell);
+                source.Direction = new Vector3(dir.x, dir.y, 0f);
+                source.Length = length + 0.2f; // up to the far edge of the last square
+                source.Colour = colour;
             }
+
+            var silent = new List<int>();
+            foreach (int singer in songSources.Keys)
+                if (!singers.Contains(singer))
+                    silent.Add(singer);
+            foreach (int singer in silent)
+                songSources.Remove(singer);
+
+            if (flying)
+                return;
+
+            // Previews (and boards without note art): a note or tint on every square the song covers.
             foreach (var pair in colours)
             {
                 var position = (Vector3Int)pair.Key;
                 Color colour = pair.Value.sum / pair.Value.count;
                 if (noteTiles.Length > 0)
                 {
-                    // A note per square, alternating, in the singer's colour.
                     songs.SetTile(position, noteTiles[(position.x + position.y) % noteTiles.Length]);
                     colour.a = 1f;
                 }
@@ -518,23 +591,118 @@ namespace FGJ2026.Board
             }
         }
 
-        private void RefreshHints(PuzzleSimulation sim, bool show)
+        /// <summary>Spawns notes at the singers and moves them along their song lines: a slight curve, growing then shrinking, fading in and out.</summary>
+        private void UpdateNotes(float deltaTime)
         {
-            hints.ClearAllTiles();
-            if (!show)
-                return;
-            for (int x = 0; x < level.Width; x++)
+            foreach (SongSource source in songSources.Values)
             {
-                for (int y = 0; y < level.Height; y++)
+                source.Timer -= deltaTime;
+                if (source.Timer > 0f)
+                    continue;
+                source.Timer = Mathf.Max(source.Timer + NoteInterval, 0.05f);
+                SpawnNote(source);
+            }
+
+            for (int i = flyingNotes.Count - 1; i >= 0; i--)
+            {
+                FlyingNote note = flyingNotes[i];
+                note.Age += deltaTime;
+                float distance = note.Age * NoteSpeed;
+                float t = distance / note.Length;
+                if (t >= 1f)
                 {
-                    var cell = new Vector2Int(x, y);
-                    if (!sim.CanPlaceAt(cell))
-                        continue;
-                    hints.SetTile((Vector3Int)cell, dotTile);
-                    hints.SetColor((Vector3Int)cell, new Color(1f, 1f, 1f, 0.55f));
+                    note.Renderer.gameObject.SetActive(false);
+                    notePool.Add(note.Renderer);
+                    flyingNotes.RemoveAt(i);
+                    continue;
                 }
+
+                var across = new Vector3(-note.Direction.y, note.Direction.x, 0f);
+                float bend = Mathf.Sin(Mathf.PI * t) * 0.28f * note.Side;
+                note.Renderer.transform.position = Snap(note.Start + note.Direction * (0.3f + distance) + across * bend);
+                note.Renderer.transform.localScale = Vector3.one * (0.6f + 0.55f * Mathf.Sin(Mathf.PI * t));
+
+                Color c = note.Renderer.color;
+                c.a = Mathf.Clamp01(t / 0.12f) * (1f - Mathf.InverseLerp(0.6f, 1f, t));
+                note.Renderer.color = c;
             }
         }
+
+        /// <summary>Hearts for a good sweet, rain for a bad one, over the animal's head.</summary>
+        private void ShowEmote(AnimalView view, bool positive)
+        {
+            Sprite sprite = art == null ? null : positive ? art.happyEmote : art.sadEmote;
+            if (sprite == null || view.Emote == null)
+                return;
+            view.Emote.sprite = sprite;
+            view.Emote.gameObject.SetActive(true);
+            view.EmoteAge = 0f;
+            SetEmote(view);
+        }
+
+        private void UpdateEmotes(float deltaTime)
+        {
+            foreach (AnimalView view in animals.Values)
+            {
+                if (view.EmoteAge < 0f || view.Emote == null)
+                    continue;
+                view.EmoteAge += deltaTime;
+                if (view.EmoteAge >= EmoteDuration)
+                {
+                    view.EmoteAge = -1f;
+                    view.Emote.gameObject.SetActive(false);
+                    continue;
+                }
+                SetEmote(view);
+            }
+        }
+
+        private static void SetEmote(AnimalView view)
+        {
+            float age = view.EmoteAge;
+            // Rises 3 pixels while appearing, then drifts up 2 more while fading out. Whole pixels only.
+            float rise = Mathf.Min(age / 0.2f, 1f) * 3f + Mathf.Max(0f, age - (EmoteDuration - 0.45f)) / 0.45f * 2f;
+            view.Emote.transform.localPosition = new Vector3(0f, EmoteHeight + Mathf.Round(rise) / PixelsPerUnit, 0f);
+
+            float alpha = Mathf.Min(age / 0.15f, 1f) * (1f - Mathf.InverseLerp(EmoteDuration - 0.35f, EmoteDuration, age));
+            view.Emote.color = new Color(1f, 1f, 1f, alpha);
+        }
+
+        private void SpawnNote(SongSource source)
+        {
+            SpriteRenderer renderer;
+            if (notePool.Count > 0)
+            {
+                renderer = notePool[notePool.Count - 1];
+                notePool.RemoveAt(notePool.Count - 1);
+                renderer.gameObject.SetActive(true);
+            }
+            else
+            {
+                renderer = CreateSprite("Note", objects, null, NoteOrder);
+            }
+
+            renderer.sprite = noteSprites[noteCounter % noteSprites.Length];
+            Color colour = source.Colour;
+            colour.a = 0f;
+            renderer.color = colour;
+            renderer.transform.position = Snap(source.Start);
+            renderer.transform.localScale = Vector3.one * 0.6f;
+
+            flyingNotes.Add(new FlyingNote
+            {
+                Renderer = renderer,
+                Start = source.Start,
+                Direction = source.Direction,
+                Length = source.Length,
+                Age = 0f,
+                Side = noteCounter % 2 == 0 ? 1f : -1f // alternate curving left and right
+            });
+            noteCounter++;
+        }
+
+        /// <summary>No hint dots any more: the hover cursor dims over squares where nothing can be placed.</summary>
+        private void RefreshHints(PuzzleSimulation sim, bool show) => hints.ClearAllTiles();
 
         private void RefreshItems(PuzzleSimulation sim)
         {
@@ -575,8 +743,7 @@ namespace FGJ2026.Board
                 Vector3 snapped = Snap(view.Position);
                 view.Root.transform.position = snapped;
 
-                Vector3 facing = Quaternion.Euler(view.Arrow.localEulerAngles) * Vector3.right;
-                view.Arrow.position = snapped + new Vector3(Mathf.Round(facing.x), Mathf.Round(facing.y), 0f);
+                view.Arrow.position = snapped; // the mark sits on the animal's own square, at the edge it faces
             }
         }
 

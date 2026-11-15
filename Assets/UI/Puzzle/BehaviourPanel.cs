@@ -22,6 +22,7 @@ namespace FGJ2026.UI
         private readonly Label emptyLabel;
         private readonly Dictionary<int, (VisualElement block, Label text)> blocks = new Dictionary<int, (VisualElement, Label)>();
         private readonly List<int> order = new List<int>();
+        private readonly string colourName;
 
         public int AnimalIndex { get; }
         public VisualElement Root { get; }
@@ -34,7 +35,10 @@ namespace FGJ2026.UI
             Root = panelTemplate.Instantiate();
             parent.Add(Root);
             Root.Q("swatch").AddToClassList(ColorClass(animal.Color));
-            Root.Q<Label>("animalName").text = RuleText.Colour(animal.Color);
+            colourName = animal.Color.ToString().ToLowerInvariant();
+            Root.Q("behaviourPanel").AddToClassList("behaviour-panel--" + colourName);
+            Root.Q("behaviourPanel").EnableInClassList("behaviour-panel--light", IsLight(animal.Color));
+            Root.Q<Label>("animalName").text = animal.Color.ToString();
             status = Root.Q<Label>("status");
             blockList = Root.Q("blockList");
             emptyLabel = Root.Q<Label>("emptyLabel");
@@ -42,6 +46,13 @@ namespace FGJ2026.UI
         }
 
         public static string ColorClass(AnimalColor color) => "color-" + color.ToString().ToLowerInvariant();
+
+        /// <summary>Light panel colours get dark text.</summary>
+        private static bool IsLight(AnimalColor color)
+        {
+            UnityEngine.Color c = Palette.Of(color).linear;
+            return 0.2126f * c.r + 0.7152f * c.g + 0.0722f * c.b > 0.2f;
+        }
 
         public void Refresh(Animal animal)
         {
@@ -60,8 +71,8 @@ namespace FGJ2026.UI
                 var (block, text) = blocks[rule.Id];
                 block.EnableInClassList(PendingClass, rule.Pending);
                 text.text = rule.Pending
-                    ? $"{RuleText.Format(rule)}\n<size=75%><i>learned today - works from tomorrow</i></size>"
-                    : RuleText.Format(rule);
+                    ? $"{RuleText.Format(rule, onLight: true)}\n<size=75%><i>learned today - works from tomorrow</i></size>"
+                    : RuleText.Format(rule, onLight: true);
             }
         }
 
@@ -87,6 +98,7 @@ namespace FGJ2026.UI
             {
                 TemplateContainer instance = blockTemplate.Instantiate();
                 blockList.Add(instance);
+                instance.Q("block").AddToClassList("behaviour-block--" + colourName);
                 blocks[rule.Id] = (instance.Q("block"), instance.Q<Label>("blockText"));
                 order.Add(rule.Id);
             }

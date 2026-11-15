@@ -19,7 +19,7 @@
 .level-header {
     flex-direction: row;
     align-items: center;
-    height: 100px;
+    height: 138px;
 }
 
 .level-title {
@@ -32,14 +32,20 @@
     align-items: center;
 }
 
-.total-stars > .star {
-    width: 63px;
-    height: 57px;
+/* The Stars sprite (39x23) at 6x, with the count written over it */
+.total-stars__icon {
+    width: 234px;
+    height: 138px;
+    padding-top: 18px;
+    justify-content: center;
+    background-image: url("project://database/Assets/Art/ui.png?fileID=8599436577718238185&guid=e8afd4c812d601c478793753c404b6ba&type=3#Stars");
 }
 
 .total-stars__label {
-    margin-left: 12px;
+    color: var(--color-text-dark);
     font-size: 40px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
 }
 
 .level-grid {
@@ -57,8 +63,8 @@
 }
 
 .level-card {
-    width: 216px;
-    height: 220px;
+    width: 252px;
+    height: 240px;
     margin: 0 24px 24px 0;
     padding: 0;
     align-items: center;
@@ -66,8 +72,8 @@
 }
 
 .level-card__pad {
-    width: 216px;
-    height: 144px;
+    width: 252px;
+    height: 162px;
     padding: 14px 0 18px 30px;
     justify-content: center;
     background-image: url("project://database/Assets/Art/ui.png?fileID=-6774437969098921397&guid=e8afd4c812d601c478793753c404b6ba&type=3#Puzzle_Button");
@@ -108,7 +114,7 @@
 }
 
 .level-card__stars > .star {
-    margin: 0 2px;
+    margin: 0;
 }
 
 .empty-label {
@@ -142,10 +148,11 @@
     margin: 6px 0;
 }
 
+/* Inner edge of the ring (art px): left 2, top 3, right 1, bottom 5 - the picture goes right up to it */
 .preview {
     flex-grow: 1;
-    margin: 24px 22px 34px 22px;
-    background-color: var(--color-bg);
+    margin: 18px 6px 30px 12px;
+    background-color: #7898A8; /* the board's water */
 }
 
 /* Grassy frame drawn over the preview picture */
