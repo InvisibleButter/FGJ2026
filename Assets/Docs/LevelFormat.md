@@ -1,8 +1,12 @@
 # Level format
 
-Levels are JSON files in `Assets/Resources/Levels/`. They are loaded in file-name order,
-so prefix them with a number (`04_MyLevel.json`). The test
-`SimulationTests.ShippedLevels_LoadAndTheirSolutionsWin` checks every file and plays its `solution`.
+The easiest way to make levels is the **level editor** (start menu > Level editor, or open
+`Assets/Scenes/LevelEditor.unity` and press Play). It saves here as well, but only inside the Unity Editor.
+
+Levels are JSON files in `Assets/Resources/Levels/`. The play order is the list of level ids in
+`Assets/Resources/LevelOrder.json`; levels missing from it come last, sorted by file name. The test
+`SimulationTests.ShippedLevels_LoadAndTheirSolutionsWin` checks every file and plays its `solution`
+(the editor stores the last won test run as the solution).
 
 Coordinates: `x` grows to the east, `y` grows to the **north**, `(0,0)` is the bottom-left square.
 

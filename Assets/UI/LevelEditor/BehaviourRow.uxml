@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="behaviourRow" class="behaviour-row">
+        <ui:Label name="behaviourText" class="behaviour-row__text" />
+        <ui:Button name="removeButton" text="x" class="behaviour-row__remove" />
+    </ui:VisualElement>
+</ui:UXML>

@@ -9,6 +9,9 @@ namespace FGJ2026
 
         public static ServiceLocator Instance => instance ??= new ServiceLocator();
 
+        /// <summary>Drops all services (start of Play mode without a domain reload).</summary>
+        public static void Reset() => instance = null;
+
         private readonly Dictionary<Type, IService> registeredServices = new Dictionary<Type, IService>();
 
         public event Action AllInitialized;

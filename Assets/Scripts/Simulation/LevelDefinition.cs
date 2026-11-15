@@ -142,7 +142,9 @@ namespace FGJ2026.Simulation
         public int GetItemCount(ItemType type) => itemCounts.TryGetValue(type, out int count) ? count : 0;
         public int TotalItems => itemCounts.Values.Sum();
 
-        public static bool TryParse(string json, string fallbackId, out LevelDefinition level, out string error)
+        /// <param name="lenient">For the level editor's preview: allow a level without animals or flags,
+        /// and flags without an animal of their colour.</param>
+        public static bool TryParse(string json, string fallbackId, out LevelDefinition level, out string error, bool lenient = false)
         {
             level = null;
             try
@@ -154,7 +156,7 @@ namespace FGJ2026.Simulation
                 if (data == null)
                     throw new FormatException("the file is not a level.");
 
-                level = Build(data, fallbackId);
+                level = Build(data, fallbackId, lenient);
                 error = null;
                 return true;
             }
@@ -165,9 +167,11 @@ namespace FGJ2026.Simulation
             }
         }
 
-        private static LevelDefinition Build(LevelFile data, string fallbackId)
+        private static LevelDefinition Build(LevelFile data, string fallbackId, bool lenient)
         {
             string id = string.IsNullOrWhiteSpace(data.id) ? fallbackId : data.id.Trim();
+            if (lenient && string.IsNullOrWhiteSpace(id))
+                id = "draft";
             if (string.IsNullOrWhiteSpace(id))
                 throw new FormatException("the level needs an id.");
             string name = string.IsNullOrWhiteSpace(data.name) ? id : data.name.Trim();
@@ -194,7 +198,7 @@ namespace FGJ2026.Simulation
 
             // Animals
             AnimalEntry[] animalEntries = data.animals ?? Array.Empty<AnimalEntry>();
-            if (animalEntries.Length == 0)
+            if (animalEntries.Length == 0 && !lenient)
                 throw new FormatException("the level needs at least one animal.");
 
             var animals = new List<AnimalSetup>();
@@ -229,7 +233,7 @@ namespace FGJ2026.Simulation
 
             // Flags
             FlagEntry[] flagEntries = data.flags ?? Array.Empty<FlagEntry>();
-            if (flagEntries.Length == 0)
+            if (flagEntries.Length == 0 && !lenient)
                 throw new FormatException("the level needs at least one flag.");
 
             var flags = new List<FlagSetup>();
@@ -248,7 +252,7 @@ namespace FGJ2026.Simulation
                     throw new FormatException($"{field} must be on a free square (not blocked, no animal).");
                 if (!flagCells.Add(cell))
                     throw new FormatException($"{field} shares its square with another flag.");
-                if (animals.All(a => a.Color != color))
+                if (!lenient && animals.All(a => a.Color != color))
                     throw new FormatException($"{field}: there is no {color} animal for this flag.");
 
                 flags.Add(new FlagSetup(color, cell));

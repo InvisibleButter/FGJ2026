@@ -1,0 +1,30 @@
+{
+    "id": "duet",
+    "name": "Duet",
+    "width": 7,
+    "height": 5,
+    "days": 3,
+    "ticksPerDay": 24,
+    "animals": [
+        { "color": "blue", "x": 3, "y": 4, "facing": "south", "behaviours": ["sing"] },
+        { "color": "red", "x": 0, "y": 2, "facing": "east", "behaviours": ["move"] },
+        { "color": "yellow", "x": 6, "y": 1, "facing": "west", "behaviours": ["move"] }
+    ],
+    "flags": [
+        { "color": "red", "x": 3, "y": 3 },
+        { "color": "yellow", "x": 3, "y": 0 }
+    ],
+    "items": [
+        { "type": "goodSweet", "count": 1 },
+        { "type": "badSweet", "count": 1 }
+    ],
+    "stars": [
+        { "type": "solve" },
+        { "type": "maxTicks", "value": 13 },
+        { "type": "maxDays", "value": 2 }
+    ],
+    "solution": [
+        { "day": 1, "item": "goodSweet", "x": 3, "y": 2 },
+        { "day": 1, "item": "badSweet", "x": 3, "y": 1 }
+    ]
+}

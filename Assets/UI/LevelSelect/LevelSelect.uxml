@@ -1,0 +1,26 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Style src="LevelSelect.uss" />
+    <ui:VisualElement name="levelSelect" class="level-select">
+        <ui:VisualElement class="level-list-side">
+            <ui:VisualElement class="level-header">
+                <ui:Label text="Puzzles" class="level-title" />
+                <ui:VisualElement class="total-stars">
+                    <ui:VisualElement class="star star--on" />
+                    <ui:Label name="totalStarsLabel" text="0 / 0" class="total-stars__label" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="levelGrid" class="level-grid">
+                <ui:Label name="emptyLabel" text="No puzzles found. Add level files to Assets/Resources/Levels." class="empty-label hidden" />
+            </ui:VisualElement>
+            <ui:Button name="backButton" text="Back" class="back-button" />
+        </ui:VisualElement>
+        <ui:VisualElement name="details" class="panel details">
+            <ui:Label name="detailNumber" text="Puzzle 1" class="details__number" />
+            <ui:Label name="detailName" text="Name" class="details__name" />
+            <ui:Image name="preview" class="preview" />
+            <ui:Label name="detailInfo" class="details__info" />
+            <ui:VisualElement name="detailStars" class="details__stars" />
+            <ui:Button name="playButton" text="Play" class="play-button button--go" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

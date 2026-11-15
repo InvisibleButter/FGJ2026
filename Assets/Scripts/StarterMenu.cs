@@ -15,6 +15,8 @@ namespace FGJ2026
 
         public void StartGame() => GameManager.Instance.OpenLevelSelect();
 
+        public void OpenLevelEditor() => GameManager.Instance.OpenLevelEditor();
+
         public void ShowCredits()
         {
             menuPanel.SetActive(false);

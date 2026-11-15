@@ -1,0 +1,33 @@
+{
+    "id": "pond-watch",
+    "name": "Pond Watch",
+    "width": 6,
+    "height": 4,
+    "days": 2,
+    "ticksPerDay": 24,
+    "animals": [
+        { "color": "green", "x": 0, "y": 3, "facing": "east", "behaviours": ["move"] },
+        { "color": "yellow", "x": 5, "y": 3, "facing": "west", "behaviours": [] }
+    ],
+    "flags": [
+        { "color": "green", "x": 4, "y": 0 }
+    ],
+    "blocked": [
+        { "x": 1, "y": 1 },
+        { "x": 2, "y": 1 },
+        { "x": 3, "y": 1 }
+    ],
+    "items": [
+        { "type": "goodSweet", "count": 2 },
+        { "type": "badSweet", "count": 1 }
+    ],
+    "stars": [
+        { "type": "solve" },
+        { "type": "maxTicks", "value": 33 },
+        { "type": "maxItems", "value": 2 }
+    ],
+    "solution": [
+        { "day": 1, "item": "badSweet", "x": 1, "y": 3 },
+        { "day": 2, "item": "goodSweet", "x": 4, "y": 3 }
+    ]
+}

@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="stepper" class="stepper">
+        <ui:Label name="stepperLabel" text="Value" class="stepper__label" />
+        <ui:Button name="minusButton" text="-" class="stepper__button" />
+        <ui:Label name="stepperValue" text="0" class="stepper__value" />
+        <ui:Button name="plusButton" text="+" class="stepper__button" />
+    </ui:VisualElement>
+</ui:UXML>

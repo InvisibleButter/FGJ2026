@@ -1,0 +1,333 @@
+.puzzle-screen {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+/* Top bar */
+
+.top-bar {
+    flex-direction: row;
+    align-items: center;
+    height: 120px;
+    padding: 0 40px;
+}
+
+.title-block {
+    width: 460px;
+}
+
+.puzzle-number {
+    font-size: 22px;
+    color: var(--color-text-dim);
+}
+
+.puzzle-name {
+    font-size: 40px;
+}
+
+.calendar {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+}
+
+.calendar__label {
+    margin-right: 10px;
+    font-size: 26px;
+    color: var(--color-text-dim);
+}
+
+.day-list {
+    flex-direction: row;
+}
+
+.day {
+    width: 64px;
+    height: 64px;
+    margin-right: 10px;
+    background-color: var(--color-panel);
+    border-radius: 6px;
+    transition-duration: 0.3s;
+}
+
+.day__label {
+    flex-grow: 1;
+    font-size: 30px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}
+
+.day--past {
+    background-color: var(--color-panel-light);
+}
+
+.day--past > .day__label {
+    color: var(--color-text-dim);
+}
+
+.day--current {
+    background-color: var(--color-accent);
+}
+
+.day--current > .day__label {
+    color: var(--color-text-dark);
+}
+
+.clock {
+    flex-direction: row;
+    align-items: center;
+    width: 340px;
+}
+
+.clock__tick {
+    width: 90px;
+    font-size: 48px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}
+
+.clock__info {
+    flex-grow: 1;
+}
+
+.clock__caption {
+    font-size: 20px;
+}
+
+.clock__bar {
+    margin: 6px 0 0 0;
+}
+
+.clock__bar .unity-progress-bar__background {
+    height: 10px;
+    background-color: var(--color-panel);
+    border-width: 0;
+    border-radius: 5px;
+}
+
+.clock__bar .unity-progress-bar__progress {
+    background-color: var(--color-accent);
+    border-radius: 5px;
+}
+
+.clock__bar .unity-progress-bar__title-container {
+    display: none;
+}
+
+.top-buttons {
+    flex-direction: row;
+}
+
+.top-button {
+    height: 66px;
+    margin-left: 14px;
+}
+
+/* Middle: behaviour lists left and right, the board (drawn by the camera) in between */
+
+.middle {
+    flex-direction: row;
+    flex-grow: 1;
+    padding: 10px 30px;
+}
+
+.behaviour-column {
+    width: 420px;
+}
+
+.board-area {
+    flex-grow: 1;
+    margin: 0 20px;
+}
+
+.behaviour-panel {
+    margin-bottom: 16px;
+}
+
+.behaviour-panel__header {
+    flex-direction: row;
+    align-items: center;
+    height: 40px;
+}
+
+.behaviour-panel__name {
+    margin-left: 12px;
+    font-size: 30px;
+    -unity-font-style: bold;
+}
+
+.behaviour-panel__status {
+    margin: 4px 0 8px 0;
+    font-size: 20px;
+    color: var(--color-text-dim);
+}
+
+.behaviour-panel__empty {
+    font-size: 22px;
+    color: var(--color-text-dim);
+    -unity-font-style: italic;
+}
+
+.behaviour-block {
+    min-height: 52px;
+    margin-top: 6px;
+    padding: 10px 14px;
+    justify-content: center;
+    background-color: var(--color-panel-light);
+    border-radius: 6px;
+    transition-duration: 0.5s;
+}
+
+.behaviour-block__text {
+    font-size: 24px;
+    white-space: normal;
+}
+
+.behaviour-block--pending {
+    opacity: 0.5;
+}
+
+.behaviour-block--active {
+    background-color: #8C8866;
+    transition-duration: 0s;
+}
+
+.behaviour-block--learned {
+    background-color: #C2AE52;
+    opacity: 1;
+    transition-duration: 0s;
+}
+
+/* Bottom bar */
+
+.bottom-bar {
+    flex-direction: row;
+    align-items: center;
+    height: 160px;
+    padding: 0 40px;
+    background-color: var(--color-panel);
+}
+
+.item-bag {
+    flex-direction: row;
+    align-items: center;
+    width: 660px;
+}
+
+.item-bag__label {
+    width: 70px;
+    color: var(--color-text-dim);
+    white-space: normal;
+}
+
+.item-list {
+    flex-direction: row;
+}
+
+.item-button {
+    flex-direction: row;
+    align-items: center;
+    width: 260px;
+    height: 100px;
+    margin-left: 14px;
+    padding: 8px 14px;
+}
+
+.item-button--selected {
+    background-color: var(--color-button);
+}
+
+.item-button--selected:hover {
+    background-color: var(--color-button-hover);
+}
+
+.item-button > .item-icon {
+    margin-right: 14px;
+}
+
+.item-button__label {
+    flex-grow: 1;
+    font-size: 24px;
+    -unity-text-align: middle-left;
+    white-space: normal;
+}
+
+.status {
+    flex-grow: 1;
+    margin: 0 30px;
+}
+
+.phase-label {
+    font-size: 24px;
+    color: var(--color-accent);
+}
+
+.message-label {
+    font-size: 22px;
+    white-space: normal;
+}
+
+.actions {
+    flex-direction: row;
+}
+
+.action-button {
+    height: 92px;
+    margin-left: 14px;
+    font-size: 34px;
+}
+
+.start-button {
+    width: 210px;
+}
+
+.skip-button {
+    width: 180px;
+}
+
+/* Result window */
+
+.overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.65);
+}
+
+.result-card {
+    width: 900px;
+    padding: 40px;
+    background-color: var(--color-panel);
+    border-radius: 10px;
+}
+
+.result-title {
+    font-size: 58px;
+    color: var(--color-accent);
+    -unity-text-align: middle-center;
+}
+
+.result-subtitle {
+    margin-bottom: 14px;
+    color: var(--color-text-dim);
+    -unity-text-align: middle-center;
+}
+
+.result-buttons {
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.result-button {
+    height: 72px;
+    margin: 0 8px;
+}

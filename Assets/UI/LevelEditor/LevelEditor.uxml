@@ -1,0 +1,183 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Template name="Stepper" src="Stepper.uxml" />
+    <ui:Style src="LevelEditor.uss" />
+    <ui:VisualElement name="editorScreen" class="editor-screen" picking-mode="Ignore">
+        <ui:VisualElement class="editor-top-bar">
+            <ui:Label text="Level editor" class="editor-title" />
+            <ui:Label name="levelLabel" text="New level" class="editor-level-label" />
+            <ui:Button name="openButton" text="Open / New" class="editor-top-button" />
+            <ui:Button name="testButton" text="Test run" class="editor-top-button button--go" />
+            <ui:Button name="saveButton" text="Save" class="editor-top-button button--primary" />
+            <ui:Button name="exitButton" text="Exit" class="editor-top-button" />
+        </ui:VisualElement>
+
+        <ui:VisualElement class="editor-middle" picking-mode="Ignore">
+            <!-- Left: tools and level settings -->
+            <ui:VisualElement class="panel editor-side">
+                <ui:ScrollView class="editor-scroll" vertical-scroller-visibility="Hidden" horizontal-scroller-visibility="Hidden">
+                    <ui:Label text="Tools" class="section-title" />
+                    <ui:VisualElement class="choice-row">
+                        <ui:Button name="toolSelect" text="Select" class="choice" />
+                        <ui:Button name="toolGrass" text="Grass" class="choice" />
+                        <ui:Button name="toolWater" text="Water" class="choice" />
+                        </ui:VisualElement>
+                    <ui:VisualElement class="choice-row">
+                        <ui:Button name="toolAnimal" text="Animal" class="choice" />
+                        <ui:Button name="toolFlag" text="Flag" class="choice" />
+                        <ui:Button name="toolErase" text="Erase" class="choice" />
+                    </ui:VisualElement>
+                    <ui:Label text="Colour (for new or selected animals / flags)" class="field-label" />
+                    <ui:VisualElement class="choice-row">
+                        <ui:Button name="colorRed" class="choice color-choice"><ui:VisualElement class="swatch color-red" /></ui:Button>
+                        <ui:Button name="colorBlue" class="choice color-choice"><ui:VisualElement class="swatch color-blue" /></ui:Button>
+                        <ui:Button name="colorGreen" class="choice color-choice"><ui:VisualElement class="swatch color-green" /></ui:Button>
+                        <ui:Button name="colorYellow" class="choice color-choice"><ui:VisualElement class="swatch color-yellow" /></ui:Button>
+                        <ui:Button name="colorPurple" class="choice color-choice"><ui:VisualElement class="swatch color-purple" /></ui:Button>
+                        <ui:Button name="colorOrange" class="choice color-choice"><ui:VisualElement class="swatch color-orange" /></ui:Button>
+                        <ui:Button name="colorPink" class="choice color-choice"><ui:VisualElement class="swatch color-pink" /></ui:Button>
+                        <ui:Button name="colorWhite" class="choice color-choice"><ui:VisualElement class="swatch color-white" /></ui:Button>
+                    </ui:VisualElement>
+
+                    <ui:Label text="Level" class="section-title" />
+                    <ui:Label text="Name" class="field-label" />
+                    <ui:TextField name="nameField" max-length="40" class="name-field" />
+                    <ui:Instance template="Stepper" name="widthStepper">
+                        <ui:AttributeOverrides element-name="stepperLabel" text="Width" />
+                    </ui:Instance>
+                    <ui:Instance template="Stepper" name="heightStepper">
+                        <ui:AttributeOverrides element-name="stepperLabel" text="Height" />
+                    </ui:Instance>
+                    <ui:Instance template="Stepper" name="daysStepper">
+                        <ui:AttributeOverrides element-name="stepperLabel" text="Days" />
+                    </ui:Instance>
+                    <ui:Instance template="Stepper" name="ticksStepper">
+                        <ui:AttributeOverrides element-name="stepperLabel" text="Ticks per day" />
+                    </ui:Instance>
+
+                    <ui:Label text="Item bag" class="section-title" />
+                    <ui:Instance template="Stepper" name="goodSweetStepper">
+                        <ui:AttributeOverrides element-name="stepperLabel" text="Good sweets" />
+                    </ui:Instance>
+                    <ui:Instance template="Stepper" name="badSweetStepper">
+                        <ui:AttributeOverrides element-name="stepperLabel" text="Bad sweets" />
+                    </ui:Instance>
+
+                    <ui:Label text="Stars" class="section-title" />
+                    <ui:Label text="Star 1: solve the puzzle (always)" class="hint" />
+                    <ui:Label text="Star 2: at most ... (limit below)" class="field-label" />
+                    <ui:VisualElement class="choice-row">
+                        <ui:Button name="star1None" text="None" class="choice" />
+                        <ui:Button name="star1MaxTicks" text="Ticks" class="choice" />
+                        <ui:Button name="star1MaxItems" text="Items" class="choice" />
+                        <ui:Button name="star1MaxDays" text="Days" class="choice" />
+                    </ui:VisualElement>
+                    <ui:Instance template="Stepper" name="star1Stepper">
+                        <ui:AttributeOverrides element-name="stepperLabel" text="Limit" />
+                    </ui:Instance>
+                    <ui:Label text="Star 3: at most ... (limit below)" class="field-label" />
+                    <ui:VisualElement class="choice-row">
+                        <ui:Button name="star2None" text="None" class="choice" />
+                        <ui:Button name="star2MaxTicks" text="Ticks" class="choice" />
+                        <ui:Button name="star2MaxItems" text="Items" class="choice" />
+                        <ui:Button name="star2MaxDays" text="Days" class="choice" />
+                    </ui:VisualElement>
+                    <ui:Instance template="Stepper" name="star2Stepper">
+                        <ui:AttributeOverrides element-name="stepperLabel" text="Limit" />
+                    </ui:Instance>
+
+                    <ui:Label text="Game flow" class="section-title" />
+                    <ui:Instance template="Stepper" name="flowStepper">
+                        <ui:AttributeOverrides element-name="stepperLabel" text="Puzzle number" />
+                    </ui:Instance>
+                    <ui:Label name="flowHint" class="hint" />
+                </ui:ScrollView>
+            </ui:VisualElement>
+
+            <!-- Middle: the board (drawn by the camera) -->
+            <ui:VisualElement name="boardArea" class="editor-board-area" picking-mode="Ignore">
+                <ui:Label text="Left click: use tool  |  Drag: paint  |  Right click: remove  |  R / Shift+R: rotate  |  Delete: remove selected" class="editor-help" picking-mode="Ignore" />
+            </ui:VisualElement>
+
+            <!-- Right: selection, checks, test runs -->
+            <ui:VisualElement class="panel editor-side">
+                <ui:ScrollView class="editor-scroll" vertical-scroller-visibility="Hidden" horizontal-scroller-visibility="Hidden">
+                    <ui:Label text="Selection" class="section-title" />
+                    <ui:Label name="noSelection" text="Click an animal or flag (Select or Animal / Flag tool) to edit it." class="hint" />
+
+                    <ui:VisualElement name="animalInspector" class="hidden">
+                        <ui:Label name="animalTitle" class="selection-title" />
+                        <ui:VisualElement class="facing-row">
+                            <ui:Label name="facingLabel" text="Facing north" class="facing-label" />
+                            <ui:Button name="rotateLeftButton" text="Turn left" class="choice" />
+                            <ui:Button name="rotateRightButton" text="Turn right" class="choice" />
+                        </ui:VisualElement>
+                        <ui:Label text="Behaviours (checked from the bottom up)" class="field-label" />
+                        <ui:VisualElement name="behaviourList" />
+                        <ui:Label name="noBehaviours" text="No behaviours: the animal does nothing." class="hint hidden" />
+
+                        <ui:Label text="Add behaviour" class="section-title" />
+                        <ui:VisualElement class="choice-row">
+                            <ui:Button name="kindMove" text="Move" class="choice" />
+                            <ui:Button name="kindSing" text="Sing" class="choice" />
+                            <ui:Button name="kindHear" text="Hearing" class="choice" />
+                            <ui:Button name="kindSee" text="Seeing" class="choice" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="targetSection">
+                            <ui:Label text="What it hears / sees" class="field-label" />
+                            <ui:VisualElement class="choice-row">
+                                <ui:Button name="targetRed" class="choice color-choice"><ui:VisualElement class="swatch color-red" /></ui:Button>
+                                <ui:Button name="targetBlue" class="choice color-choice"><ui:VisualElement class="swatch color-blue" /></ui:Button>
+                                <ui:Button name="targetGreen" class="choice color-choice"><ui:VisualElement class="swatch color-green" /></ui:Button>
+                                <ui:Button name="targetYellow" class="choice color-choice"><ui:VisualElement class="swatch color-yellow" /></ui:Button>
+                                <ui:Button name="targetPurple" class="choice color-choice"><ui:VisualElement class="swatch color-purple" /></ui:Button>
+                                <ui:Button name="targetOrange" class="choice color-choice"><ui:VisualElement class="swatch color-orange" /></ui:Button>
+                                <ui:Button name="targetPink" class="choice color-choice"><ui:VisualElement class="swatch color-pink" /></ui:Button>
+                                <ui:Button name="targetWhite" class="choice color-choice"><ui:VisualElement class="swatch color-white" /></ui:Button>
+                            </ui:VisualElement>
+                            <ui:VisualElement class="choice-row">
+                                <ui:Button name="targetGoodSweet" class="choice icon-choice"><ui:VisualElement class="item-icon item-icon--good-sweet" /></ui:Button>
+                                <ui:Button name="targetBadSweet" class="choice icon-choice"><ui:VisualElement class="item-icon item-icon--bad-sweet" /></ui:Button>
+                            </ui:VisualElement>
+                            <ui:Label text="Feeling" class="field-label" />
+                            <ui:VisualElement class="choice-row">
+                                <ui:Button name="feelGood" text="Good" class="choice" />
+                                <ui:Button name="feelBad" text="Bad" class="choice" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                        <ui:Label name="addPreview" class="hint" />
+                        <ui:Button name="addBehaviourButton" text="Add behaviour" class="add-button button--primary" />
+                        <ui:Button name="deleteAnimalButton" text="Remove animal" class="danger-button" />
+                    </ui:VisualElement>
+
+                    <ui:VisualElement name="flagInspector" class="hidden">
+                        <ui:Label name="flagTitle" class="selection-title" />
+                        <ui:Label text="Pick a colour on the left to change whose flag it is." class="hint" />
+                        <ui:Button name="deleteFlagButton" text="Remove flag" class="danger-button" />
+                    </ui:VisualElement>
+
+                    <ui:Label text="Check" class="section-title" />
+                    <ui:Label name="validationLabel" class="message" />
+
+                    <ui:Label text="Test run" class="section-title" />
+                    <ui:Button name="infiniteDaysButton" text="Endless days" class="choice" />
+                    <ui:Label name="testResultLabel" class="message" />
+                    <ui:Button name="starsFromRunButton" text="Use this run for the star limits" class="wide-button hidden" />
+
+                    <ui:Label name="statusLabel" class="message" />
+                </ui:ScrollView>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- Open / new level window -->
+        <ui:VisualElement name="openOverlay" class="overlay hidden">
+            <ui:VisualElement class="open-card">
+                <ui:Label text="Open a level" class="open-title" />
+                <ui:ScrollView name="openList" class="open-list" vertical-scroller-visibility="Hidden" horizontal-scroller-visibility="Hidden" />
+                <ui:VisualElement class="open-buttons">
+                    <ui:Button name="newLevelButton" text="New level" class="button--go" />
+                    <ui:Button name="closeOpenButton" text="Cancel" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

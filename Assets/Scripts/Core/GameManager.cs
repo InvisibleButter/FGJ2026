@@ -1,3 +1,4 @@
+using FGJ2026.Simulation;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -12,9 +13,19 @@ namespace FGJ2026
         public const string MenuScene = "StarterMenu";
         public const string LevelSelectScene = "LevelSelect";
         public const string PuzzleScene = "MainGame";
+        public const string LevelEditorScene = "LevelEditor";
 
         private static GameManager instance;
         private static bool quitting;
+
+        /// <summary>The project enters Play mode without a domain reload, so static state must be reset by hand.</summary>
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStatics()
+        {
+            instance = null;
+            quitting = false;
+            ServiceLocator.Reset();
+        }
 
         public static GameManager Instance
         {
@@ -31,6 +42,12 @@ namespace FGJ2026
 
         /// <summary>Index into <see cref="LevelService.Levels"/> of the puzzle to play or show.</summary>
         public int SelectedLevelIndex { get; set; }
+
+        /// <summary>Set while a level from the level editor is being test-played.</summary>
+        public TestRun CurrentTest { get; private set; }
+
+        /// <summary>The level editor's state, kept across test runs.</summary>
+        public EditorSession EditorState { get; } = new EditorSession();
 
         private void Awake()
         {
@@ -58,13 +75,35 @@ namespace FGJ2026
                 instance = null;
         }
 
-        public void OpenMenu() => SceneManager.LoadScene(MenuScene);
+        public void OpenMenu()
+        {
+            CurrentTest = null;
+            SceneManager.LoadScene(MenuScene);
+        }
 
-        public void OpenLevelSelect() => SceneManager.LoadScene(LevelSelectScene);
+        public void OpenLevelSelect()
+        {
+            CurrentTest = null;
+            SceneManager.LoadScene(LevelSelectScene);
+        }
 
         public void OpenLevel(int index)
         {
+            CurrentTest = null;
             SelectedLevelIndex = index;
+            SceneManager.LoadScene(PuzzleScene);
+        }
+
+        public void OpenLevelEditor()
+        {
+            CurrentTest = null;
+            SceneManager.LoadScene(LevelEditorScene);
+        }
+
+        /// <summary>Plays a level from the level editor; leaving the puzzle returns to the editor.</summary>
+        public void StartTestRun(LevelDefinition level, bool infiniteDays)
+        {
+            CurrentTest = new TestRun(level, infiniteDays);
             SceneManager.LoadScene(PuzzleScene);
         }
     }

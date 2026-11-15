@@ -21,6 +21,9 @@ namespace FGJ2026.Simulation
         }
     }
 
+    /// <summary>What an animal did in a tick (for animations).</summary>
+    public enum AnimalAction { None, Move, Turn, Eat, Wait, LeaveMap, ReachFlag }
+
     public readonly struct RuleTrigger
     {
         public Animal Animal { get; }
@@ -56,6 +59,8 @@ namespace FGJ2026.Simulation
         /// <summary>New (pending) rules learned this tick.</summary>
         public List<RuleTrigger> Learned { get; } = new List<RuleTrigger>();
         public List<string> Events { get; } = new List<string>();
+        /// <summary>What each animal did, by animal index. Animals that did nothing are missing.</summary>
+        public Dictionary<int, AnimalAction> Actions { get; } = new Dictionary<int, AnimalAction>();
         /// <summary>Set when this tick ended the day.</summary>
         public DayReport DayEnded { get; internal set; }
 
@@ -79,6 +84,7 @@ namespace FGJ2026.Simulation
         private readonly Dictionary<Vector2Int, ItemType> items = new Dictionary<Vector2Int, ItemType>();
         private readonly Dictionary<ItemType, int> inventory = new Dictionary<ItemType, int>();
         private readonly HashSet<Vector2Int> placedToday = new HashSet<Vector2Int>();
+        private readonly List<PlannedPlacement> placements = new List<PlannedPlacement>();
         private PuzzleSimulation dayStart;
 
         public LevelDefinition Level { get; }
@@ -96,6 +102,8 @@ namespace FGJ2026.Simulation
 
         public IReadOnlyList<Animal> Animals => animals;
         public IReadOnlyDictionary<Vector2Int, ItemType> Items => items;
+        /// <summary>Every item placed so far, with its day: a winning run can be stored as a level's solution.</summary>
+        public IReadOnlyList<PlannedPlacement> Placements => placements;
         public bool IsFinished => Phase == PuzzlePhase.Won || Phase == PuzzlePhase.Lost;
 
         public PuzzleSimulation(LevelDefinition level)
@@ -131,6 +139,8 @@ namespace FGJ2026.Simulation
                 inventory[pair.Key] = pair.Value;
             placedToday.Clear();
             placedToday.UnionWith(source.placedToday);
+            placements.Clear();
+            placements.AddRange(source.placements);
 
             Phase = source.Phase;
             DayIndex = source.DayIndex;
@@ -161,6 +171,7 @@ namespace FGJ2026.Simulation
             inventory[type]--;
             items[cell] = type;
             placedToday.Add(cell);
+            placements.Add(new PlannedPlacement(DayNumber, type, cell));
             ItemsUsed++;
             return true;
         }
@@ -173,6 +184,9 @@ namespace FGJ2026.Simulation
 
             items.Remove(cell);
             placedToday.Remove(cell);
+            int logged = placements.FindLastIndex(p => p.Day == DayNumber && p.Cell == cell);
+            if (logged >= 0)
+                placements.RemoveAt(logged);
             inventory[type]++;
             ItemsUsed--;
             return true;
@@ -293,6 +307,7 @@ namespace FGJ2026.Simulation
             if (items.TryGetValue(animal.Cell, out ItemType item))
             {
                 items.Remove(animal.Cell);
+                report.Actions[animal.Index] = AnimalAction.Eat;
                 report.Events.Add($"{animal.Color} eats a {Names.Of(item)}.");
                 Learn(animal, item == ItemType.GoodSweet, heard, seen, report);
                 return;
@@ -346,6 +361,7 @@ namespace FGJ2026.Simulation
         private static void Turn(Animal animal, Vector2Int facing, TickReport report)
         {
             animal.Facing = facing;
+            report.Actions[animal.Index] = AnimalAction.Turn;
             report.Events.Add($"{animal.Color} turns {Directions.Name(facing)}.");
         }
 
@@ -361,25 +377,30 @@ namespace FGJ2026.Simulation
             if (!Level.Contains(next))
             {
                 animal.OffMap = true;
+                report.Actions[animal.Index] = AnimalAction.LeaveMap;
                 report.Events.Add($"{animal.Color} walks off the map.");
                 return;
             }
             if (Level.IsBlocked(next))
             {
+                report.Actions[animal.Index] = AnimalAction.Wait;
                 report.Events.Add($"{animal.Color} bumps into an obstacle.");
                 return;
             }
             Animal other = AnimalAt(next);
             if (other != null)
             {
+                report.Actions[animal.Index] = AnimalAction.Wait;
                 report.Events.Add($"{animal.Color} waits behind {other.Color}.");
                 return;
             }
 
             animal.Cell = next;
+            report.Actions[animal.Index] = AnimalAction.Move;
             if (Level.TryGetFlag(next, out FlagSetup flag) && flag.Color == animal.Color)
             {
                 animal.OnFlag = true;
+                report.Actions[animal.Index] = AnimalAction.ReachFlag;
                 report.Events.Add($"{animal.Color} reaches its flag!");
             }
         }

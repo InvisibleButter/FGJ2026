@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="behaviourPanel" class="panel behaviour-panel">
+        <ui:VisualElement class="behaviour-panel__header">
+            <ui:VisualElement name="swatch" class="swatch" />
+            <ui:Label name="animalName" class="behaviour-panel__name" />
+        </ui:VisualElement>
+        <ui:Label name="status" class="behaviour-panel__status" />
+        <ui:VisualElement name="blockList" />
+        <ui:Label name="emptyLabel" text="does nothing" class="behaviour-panel__empty hidden" />
+    </ui:VisualElement>
+</ui:UXML>

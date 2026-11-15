@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Button name="itemButton" class="item-button">
+        <ui:VisualElement name="icon" class="item-icon" />
+        <ui:Label name="itemLabel" class="item-button__label" />
+    </ui:Button>
+</ui:UXML>

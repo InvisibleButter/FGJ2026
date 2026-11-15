@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Button name="levelCard" class="level-card">
+        <ui:Label name="cardNumber" text="1" class="level-card__number" />
+        <ui:Label name="cardName" text="Name" class="level-card__name" />
+        <ui:VisualElement name="cardStars" class="level-card__stars" />
+    </ui:Button>
+</ui:UXML>

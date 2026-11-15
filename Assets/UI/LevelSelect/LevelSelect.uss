@@ -1,0 +1,141 @@
+.level-select {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    flex-direction: row;
+    padding: 50px 60px;
+    background-color: var(--color-bg);
+}
+
+.level-list-side {
+    flex-grow: 1;
+    margin-right: 40px;
+}
+
+.level-header {
+    flex-direction: row;
+    align-items: center;
+    height: 100px;
+}
+
+.level-title {
+    flex-grow: 1;
+    font-size: 64px;
+}
+
+.total-stars {
+    flex-direction: row;
+    align-items: center;
+}
+
+.total-stars > .star {
+    width: 54px;
+    height: 54px;
+}
+
+.total-stars__label {
+    margin-left: 12px;
+    font-size: 40px;
+}
+
+.level-grid {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    flex-grow: 1;
+    margin-top: 20px;
+}
+
+.level-card {
+    width: 240px;
+    height: 220px;
+    margin: 0 24px 24px 0;
+    padding: 12px;
+    justify-content: space-between;
+    background-color: var(--color-panel);
+    border-radius: 8px;
+}
+
+.level-card:hover {
+    background-color: var(--color-panel-hover);
+}
+
+.level-card--selected {
+    background-color: var(--color-panel-light);
+}
+
+.level-card--selected:hover {
+    background-color: var(--color-panel-light);
+}
+
+.level-card__number {
+    font-size: 64px;
+    color: var(--color-accent);
+    -unity-text-align: middle-center;
+}
+
+.level-card__name {
+    font-size: 26px;
+    -unity-font-style: normal;
+    -unity-text-align: middle-center;
+    white-space: normal;
+}
+
+.level-card__stars {
+    flex-direction: row;
+    justify-content: center;
+}
+
+.level-card__stars > .star {
+    margin: 0 3px;
+}
+
+.empty-label {
+    font-size: 30px;
+    color: var(--color-text-dim);
+}
+
+.back-button {
+    align-self: flex-start;
+    width: 200px;
+    height: 72px;
+}
+
+.details {
+    width: 700px;
+    padding: 30px;
+}
+
+.details__number {
+    font-size: 28px;
+    color: var(--color-text-dim);
+    -unity-text-align: middle-center;
+}
+
+.details__name {
+    font-size: 48px;
+    -unity-text-align: middle-center;
+}
+
+.preview {
+    height: 330px;
+    margin: 10px 0;
+}
+
+.details__info {
+    margin-bottom: 10px;
+    font-size: 24px;
+    color: var(--color-text-dim);
+    -unity-text-align: middle-center;
+}
+
+.details__stars {
+    flex-grow: 1;
+}
+
+.play-button {
+    height: 86px;
+    font-size: 36px;
+}

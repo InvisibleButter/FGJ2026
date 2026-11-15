@@ -1,0 +1,162 @@
+:root {
+    --color-bg: #1C2129;
+    --color-panel: #2B313B;
+    --color-panel-hover: #343B47;
+    --color-panel-light: #3D4552;
+    --color-text: #F2F2F2;
+    --color-text-dim: #A8AFBD;
+    --color-text-dark: #1F2126;
+    --color-accent: #FFC747;
+    --color-good: #6BDE75;
+    --color-bad: #FA6B6B;
+    --color-button: #4273C2;
+    --color-button-hover: #5687D6;
+    --color-button-secondary: #545C6B;
+    --color-button-secondary-hover: #697283;
+    --color-button-go: #459E61;
+    --color-button-go-hover: #55B573;
+    --color-star-on: #FFD138;
+    --color-star-off: #575C6B;
+    -unity-font: url("project://database/Assets/TextMesh%20Pro/Fonts/LiberationSans.ttf");
+    color: var(--color-text);
+    font-size: 22px;
+}
+
+/* Our own theme replaces Unity's default one, so the document root needs this rule to fill the screen. */
+.unity-ui-document__root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.hidden {
+    display: none;
+}
+
+.panel {
+    background-color: var(--color-panel);
+    border-radius: 8px;
+    padding: 14px;
+}
+
+.text-dim {
+    color: var(--color-text-dim);
+}
+
+/* Buttons */
+
+.unity-button {
+    background-color: var(--color-button-secondary);
+    color: var(--color-text);
+    border-width: 0;
+    border-radius: 6px;
+    margin: 0;
+    padding: 8px 20px;
+    font-size: 28px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    transition-duration: 0.12s;
+}
+
+.unity-button:hover {
+    background-color: var(--color-button-secondary-hover);
+}
+
+.unity-button:active {
+    scale: 0.97 0.97;
+}
+
+.unity-button:disabled {
+    opacity: 0.4;
+}
+
+.button--primary {
+    background-color: var(--color-button);
+}
+
+.button--primary:hover {
+    background-color: var(--color-button-hover);
+}
+
+.button--go {
+    background-color: var(--color-button-go);
+}
+
+.button--go:hover {
+    background-color: var(--color-button-go-hover);
+}
+
+/* Stars */
+
+.star {
+    width: 40px;
+    height: 40px;
+    background-image: url("project://database/Assets/UI/Shared/Icons/star.png");
+    -unity-background-image-tint-color: var(--color-star-off);
+}
+
+.star--on {
+    -unity-background-image-tint-color: var(--color-star-on);
+}
+
+.star-row {
+    flex-direction: row;
+    align-items: center;
+    height: 54px;
+}
+
+.star-row > .star {
+    width: 48px;
+    height: 48px;
+}
+
+.star-row__text {
+    flex-grow: 1;
+    margin-left: 16px;
+    font-size: 28px;
+}
+
+.star-row--off > .star-row__text {
+    color: var(--color-text-dim);
+}
+
+.star-row__note {
+    font-size: 22px;
+    color: var(--color-text-dim);
+    -unity-text-align: middle-right;
+}
+
+/* Animal colours (swatches and markers) */
+
+.swatch {
+    width: 34px;
+    height: 34px;
+    background-image: url("project://database/Assets/UI/Shared/Icons/circle.png");
+}
+
+.color-red { -unity-background-image-tint-color: #E04540; }
+.color-blue { -unity-background-image-tint-color: #427FED; }
+.color-green { -unity-background-image-tint-color: #339E45; }
+.color-yellow { -unity-background-image-tint-color: #F5CC29; }
+.color-purple { -unity-background-image-tint-color: #9961D6; }
+.color-orange { -unity-background-image-tint-color: #F58C2E; }
+.color-pink { -unity-background-image-tint-color: #F580B8; }
+.color-white { -unity-background-image-tint-color: #F2F2F2; }
+
+/* Items */
+
+.item-icon {
+    width: 48px;
+    height: 48px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.item-icon--good-sweet {
+    background-image: url("project://database/Assets/Art/Animations.png?fileID=-1549255267&guid=6b67d35042a9a154e862226cb39d14c9&type=3#Deliciuose_Sweet");
+}
+
+.item-icon--bad-sweet {
+    background-image: url("project://database/Assets/Art/Animations.png?fileID=-817041578&guid=6b67d35042a9a154e862226cb39d14c9&type=3#Horrible_Sweet");
+}

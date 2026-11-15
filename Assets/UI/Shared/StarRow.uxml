@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="starRow" class="star-row">
+        <ui:VisualElement name="star" class="star" />
+        <ui:Label name="description" class="star-row__text" />
+        <ui:Label name="note" class="star-row__note" />
+    </ui:VisualElement>
+</ui:UXML>

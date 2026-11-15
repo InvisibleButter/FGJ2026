@@ -129,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 211015281}
   - component: {fileID: 211015280}
+  - component: {fileID: 211015282}
   m_Layer: 0
   m_Name: Puzzle
   m_TagString: Untagged
@@ -148,6 +149,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 589b54dcc1fc19c4c9f9de90a2ec0e88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FGJ2026.PuzzleController
+  document: {fileID: 211015282}
+  dayTemplate: {fileID: 9197481963319205126, guid: 443b5e29197f5824fa4fc83b1fea612d, type: 3}
+  itemButtonTemplate: {fileID: 9197481963319205126, guid: d35b36cf07a2021429cc4e672b88d48e, type: 3}
+  behaviourPanelTemplate: {fileID: 9197481963319205126, guid: a7ddad08449639342bb81c4789607887, type: 3}
+  behaviourBlockTemplate: {fileID: 9197481963319205126, guid: d66b2011ffd5a1d408ba52e791f7f1fa, type: 3}
+  starRowTemplate: {fileID: 9197481963319205126, guid: 7fee15eb47241de49b58d89798138979, type: 3}
   secondsPerTick: 1
   startDelay: 0.35
 --- !u!4 &211015281
@@ -165,6 +172,29 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &211015282
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 211015279}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.dll::UnityEngine.UIElements.UIDocument
+  m_PanelSettings: {fileID: 11400000, guid: 89f4b08fa9c44aa4fbf9f6342a72ab01, type: 2}
+  m_ParentUI: {fileID: 0}
+  sourceAsset: {fileID: 9197481963319205126, guid: 2d237ce9102dc1245868bd11f23aa8bd, type: 3}
+  m_SortingOrder: 0
+  m_Position: 0
+  m_WorldSpaceSizeMode: 1
+  m_WorldSpaceWidth: 1920
+  m_WorldSpaceHeight: 1080
+  m_PivotReferenceSize: 0
+  m_Pivot: 0
+  m_WorldSpaceCollider: {fileID: 0}
 --- !u!1 &1849784806
 GameObject:
   m_ObjectHideFlags: 0

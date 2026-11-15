@@ -1,0 +1,60 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Style src="PuzzleScreen.uss" />
+    <ui:VisualElement name="puzzleScreen" class="puzzle-screen" picking-mode="Ignore">
+        <ui:VisualElement name="topBar" class="top-bar" picking-mode="Ignore">
+            <ui:VisualElement class="title-block" picking-mode="Ignore">
+                <ui:Label name="puzzleNumber" text="Puzzle 1" class="puzzle-number" />
+                <ui:Label name="puzzleName" text="Puzzle name" class="puzzle-name" />
+            </ui:VisualElement>
+            <ui:VisualElement class="calendar" picking-mode="Ignore">
+                <ui:Label name="calendarLabel" text="Day" class="calendar__label" />
+                <ui:VisualElement name="dayList" class="day-list" />
+            </ui:VisualElement>
+            <ui:VisualElement class="clock">
+                <ui:Label name="clockTick" text="00" class="clock__tick" />
+                <ui:VisualElement class="clock__info">
+                    <ui:Label name="clockCaption" text="of 24 ticks" class="clock__caption" />
+                    <ui:ProgressBar name="clockBar" low-value="0" high-value="1" value="0" class="clock__bar" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement class="top-buttons" picking-mode="Ignore">
+                <ui:Button name="rewindButton" text="Rewind" class="top-button" />
+                <ui:Button name="exitButton" text="Exit" class="top-button" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="middle" class="middle" picking-mode="Ignore">
+            <ui:VisualElement name="leftColumn" class="behaviour-column" picking-mode="Ignore" />
+            <ui:VisualElement name="boardArea" class="board-area" picking-mode="Ignore" />
+            <ui:VisualElement name="rightColumn" class="behaviour-column" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:VisualElement name="bottomBar" class="bottom-bar">
+            <ui:VisualElement class="item-bag">
+                <ui:Label text="Item bag" class="item-bag__label" />
+                <ui:VisualElement name="itemList" class="item-list" />
+                <ui:Label name="emptyBagLabel" text="empty" class="text-dim hidden" />
+            </ui:VisualElement>
+            <ui:VisualElement class="status">
+                <ui:Label name="phaseLabel" text="Preparation" class="phase-label" />
+                <ui:Label name="messageLabel" class="message-label" />
+            </ui:VisualElement>
+            <ui:VisualElement class="actions">
+                <ui:Button name="startButton" text="Start" class="action-button start-button button--go" />
+                <ui:Button name="skipButton" text="Skip" class="action-button skip-button button--primary" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="resultOverlay" class="overlay hidden">
+            <ui:VisualElement class="result-card">
+                <ui:Label name="resultTitle" text="Puzzle solved!" class="result-title" />
+                <ui:Label name="resultSubtitle" class="result-subtitle" />
+                <ui:VisualElement name="resultStars" />
+                <ui:VisualElement class="result-buttons">
+                    <ui:Button name="nextPuzzleButton" text="Next puzzle" class="result-button button--go" />
+                    <ui:Button name="playAgainButton" text="Play again" class="result-button button--primary" />
+                    <ui:Button name="rewindDayButton" text="Rewind last day" class="result-button button--primary" />
+                    <ui:Button name="restartButton" text="Restart" class="result-button" />
+                    <ui:Button name="puzzlesButton" text="Puzzles" class="result-button" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
