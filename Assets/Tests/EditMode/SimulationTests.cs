@@ -92,9 +92,46 @@ namespace FGJ2026.Tests
 
             Assert.AreEqual(PuzzlePhase.Preparation, sim.Phase);
             Assert.AreEqual(0, sim.Tick);
-            Assert.AreEqual(1, sim.GetRemaining(ItemType.GoodSweet), "The sweet goes back into the bag.");
-            Assert.IsEmpty(sim.Items);
+            Assert.AreEqual(ItemType.GoodSweet, sim.Items[new Vector2Int(0, 2)], "The sweet is back where it was placed.");
+            Assert.AreEqual(0, sim.GetRemaining(ItemType.GoodSweet));
+            Assert.IsTrue(sim.IsPlacedToday(new Vector2Int(0, 2)), "It can still be moved or taken back.");
             Assert.AreEqual(new Vector2Int(0, 0), sim.Animals[0].Cell);
+
+            Assert.IsTrue(sim.TryRemoveItem(new Vector2Int(0, 2)));
+            Assert.AreEqual(1, sim.GetRemaining(ItemType.GoodSweet), "Taken back, it is in the bag again.");
+        }
+
+        [Test]
+        public void Rewind_AfterTheDayEnded_BringsBackTheEatenSweets()
+        {
+            PuzzleSimulation sim = Load(ExampleLevel);
+            sim.TryPlaceItem(new Vector2Int(0, 2), ItemType.GoodSweet);
+            sim.StartDay();
+            sim.RunToEndOfDay();
+            Assert.AreEqual(2, sim.DayNumber, "Day 1 is over.");
+            Assert.IsEmpty(sim.Items, "The sweet was eaten.");
+
+            sim.Rewind(); // in day 2's preparation: back to the start of day 1
+
+            Assert.AreEqual(1, sim.DayNumber);
+            Assert.AreEqual(PuzzlePhase.Preparation, sim.Phase);
+            Assert.AreEqual(ItemType.GoodSweet, sim.Items[new Vector2Int(0, 2)], "The sweet is back where it was placed.");
+            Assert.IsTrue(sim.Animals[0].Rules.All(r => !r.Pending) && sim.Animals[0].Rules.Count == 1, "Nothing learned yet.");
+
+            sim.Rewind(); // again: the empty start of day 1
+            Assert.AreEqual(1, sim.DayNumber);
+            Assert.IsEmpty(sim.Items);
+            Assert.AreEqual(1, sim.GetRemaining(ItemType.GoodSweet));
+            Assert.AreEqual(1, sim.Animals[0].Rules.Count, "The lesson from day 1 is forgotten again.");
+
+            // Playing day 1 again works like the first time.
+            Assert.IsTrue(sim.TryPlaceItem(new Vector2Int(0, 2), ItemType.GoodSweet));
+            sim.StartDay();
+            sim.RunToEndOfDay();
+            Assert.AreEqual(2, sim.DayNumber);
+            sim.Rewind();
+            Assert.AreEqual(1, sim.DayNumber);
+            Assert.AreEqual(ItemType.GoodSweet, sim.Items[new Vector2Int(0, 2)]);
         }
 
         [Test]

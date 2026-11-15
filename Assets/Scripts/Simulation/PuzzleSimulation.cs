@@ -87,7 +87,10 @@ namespace FGJ2026.Simulation
         private readonly Dictionary<ItemType, int> inventory = new Dictionary<ItemType, int>();
         private readonly HashSet<Vector2Int> placedToday = new HashSet<Vector2Int>();
         private readonly List<PlannedPlacement> placements = new List<PlannedPlacement>();
-        private PuzzleSimulation dayStart;
+        /// <summary>The empty start of each day's preparation (before any sweets were placed that day), by day index.</summary>
+        private readonly List<PuzzleSimulation> preparationStarts = new List<PuzzleSimulation>();
+        /// <summary>The state at each day's start button press (sweets already placed), newest on top. Rewind goes back to these.</summary>
+        private readonly Stack<PuzzleSimulation> runStarts = new Stack<PuzzleSimulation>();
 
         public LevelDefinition Level { get; }
         public PuzzlePhase Phase { get; private set; }
@@ -200,16 +203,44 @@ namespace FGJ2026.Simulation
         {
             if (Phase != PuzzlePhase.Preparation)
                 return false;
+
+            // Remember the day as it starts, sweets in place. Starting a day again replaces its old entry.
+            while (runStarts.Count > 0 && runStarts.Peek().DayIndex >= DayIndex)
+                runStarts.Pop();
+            runStarts.Push(new PuzzleSimulation(this));
+
             Phase = PuzzlePhase.Running;
             return true;
         }
 
-        /// <summary>Back to the start of the current day's preparation (before today's items were placed).</summary>
+        /// <summary>
+        /// Goes back to the start of a day, with the sweets where they were placed before that day was started
+        /// (they count as placed today, so they can still be moved or taken back):
+        /// - while a day runs, or after it was won or lost: the start of that day;
+        /// - during preparation: the start of the previous day that was played (again and again, one day back each time);
+        /// - on day 1 before anything ran: the empty start (today's items go back into the bag).
+        /// </summary>
         public void Rewind()
         {
-            if (dayStart != null)
-                CopyFrom(dayStart);
+            if (Phase != PuzzlePhase.Preparation)
+            {
+                if (runStarts.Count > 0)
+                    CopyFrom(runStarts.Peek());
+                return;
+            }
+
+            // Already back at the start of the newest run (or changing it): go one day further back.
+            if (runStarts.Count > 0 && runStarts.Peek().DayIndex >= DayIndex)
+                runStarts.Pop();
+
+            if (runStarts.Count > 0)
+                CopyFrom(runStarts.Peek());
+            else if (preparationStarts.Count > 0)
+                CopyFrom(preparationStarts[0]); // nothing played yet: the empty start of day 1
         }
+
+        /// <summary>True when Rewind would change anything.</summary>
+        public bool CanRewind => Phase != PuzzlePhase.Preparation || runStarts.Count > 0 || placedToday.Count > 0;
 
         // ---------------------------------------------------------------- Simulation
 
@@ -483,7 +514,10 @@ namespace FGJ2026.Simulation
             Tick = 0;
             placedToday.Clear();
             Phase = PuzzlePhase.Preparation;
-            dayStart = new PuzzleSimulation(this);
+            // Replaying a day after a rewind replaces the later days' entries.
+            if (preparationStarts.Count > DayIndex)
+                preparationStarts.RemoveRange(DayIndex, preparationStarts.Count - DayIndex);
+            preparationStarts.Add(new PuzzleSimulation(this));
         }
     }
 }

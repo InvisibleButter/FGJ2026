@@ -275,7 +275,9 @@ namespace FGJ2026
             sim.Rewind();
             tickTimer = 0f;
             HideResult();
-            SetMessage($"Back to the start of day {sim.DayNumber}. {PreparationHint()}");
+            SetMessage(sim.Items.Count > 0
+                ? $"Back to the start of day {sim.DayNumber}, the sweets are where you placed them. {PreparationHint()}"
+                : $"Back to the start of day {sim.DayNumber}. {PreparationHint()}");
             RefreshAll();
             if (sim.Phase == PuzzlePhase.Preparation)
                 StartPlanningAudio();
@@ -522,7 +524,7 @@ namespace FGJ2026
 
             startButton.SetEnabled(preparing);
             skipButton.SetEnabled(sim.Phase == PuzzlePhase.Running);
-            rewindButton.SetEnabled(sim.Phase != PuzzlePhase.Preparation || sim.ItemsUsed > 0 || sim.DayIndex > 0);
+            rewindButton.SetEnabled(sim.CanRewind);
         }
 
         private bool dayCountHidden => test != null && test.InfiniteDays;
