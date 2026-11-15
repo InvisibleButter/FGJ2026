@@ -25,3 +25,4 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 53b80b5b7f341594c8c466bf835d6966, type: 3}
   - {fileID: 8300000, guid: a491744b09bba0b44b6f881fd5ce20b7, type: 3}
   quak: {fileID: 8300000, guid: 41e238132e7dd9f4aac2fae1cc796398, type: 3}
+  move: {fileID: 8300000, guid: f0d7bbdd5bf515b4a903e5c962bb286d, type: 3}

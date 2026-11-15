@@ -35,18 +35,7 @@ namespace FGJ2026
             IsInitialized = false;
         }
 
-        public bool TryPlayAnimalSound(AudioSource source, AnimalColor color, AnimalSoundCue cue)
-        {
-            if (!IsInitialized || source == null || source.isPlaying || !profiles.TryGetValue(color, out AnimalSoundProfile profile))
-                return false;
-
-            AudioClip clip = profile.PickClip(cue);
-            if (clip == null)
-                return false;
-
-            source.clip = clip;
-            source.Play();
-            return true;
-        }
+        internal AudioClip PickAnimalClip(AnimalColor color, AnimalSoundCue cue) =>
+            IsInitialized && profiles.TryGetValue(color, out AnimalSoundProfile profile) ? profile.PickClip(cue) : null;
     }
 }

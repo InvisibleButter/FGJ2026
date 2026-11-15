@@ -366,7 +366,7 @@ namespace FGJ2026
                 if (animal == null)
                     continue;
 
-                planningQuakSource = board.PlayAnimalSound(animal, AnimalSoundCue.Quak);
+                planningQuakSource = board.PlayAnimalSound(animal, AnimalSoundCue.Quak, queueIfBusy: false);
                 if (planningQuakSource != null)
                     yield return new WaitWhile(() => planningQuakSource != null && planningQuakSource.isPlaying);
                 planningQuakSource = null;
@@ -419,6 +419,9 @@ namespace FGJ2026
             foreach (KeyValuePair<int, AnimalAction> entry in report.Actions)
             {
                 Animal animal = sim.Animals[entry.Key];
+                if (entry.Value is AnimalAction.Move or AnimalAction.ReachFlag)
+                    board.PlayAnimalSound(animal, AnimalSoundCue.Move);
+
                 switch (entry.Value)
                 {
                     case AnimalAction.LeaveMap:
